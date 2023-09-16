@@ -1,3 +1,10 @@
+#[macro_use]
+extern crate diesel;
+
+pub mod db;
+pub mod models;
+pub mod schema;
+
 use std::error::Error;
 
 use headless_chrome::Browser;

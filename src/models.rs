@@ -1,19 +1,20 @@
-use crate::schema::*;
-use serde::{Deserialize, Serialize};
+use diesel::prelude::*;
 
-#[derive(Debug, Serialize, Deserialize, Queryable)]
+use crate::schema::*;
+
+#[derive(Debug, Queryable)]
 pub struct Stream {
     pub id: i32,
-    pub home: String,
     pub away: String,
+    pub home: String,
     pub start_time: String,
     pub league: String,
     pub country: String,
 }
 
 #[derive(Debug, Insertable)]
-#[table_name = "stream"]
-pub struct UserNew<'a> {
+#[diesel(table_name = crate::schema::stream)]
+pub struct StreamNew<'a> {
     pub home: &'a str,
     pub away: &'a str,
     pub start_time: &'a str,
