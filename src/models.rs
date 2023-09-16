@@ -4,7 +4,7 @@ use crate::schema::*;
 
 #[derive(Debug, Queryable)]
 pub struct Stream {
-    pub id: i32,
+    pub id: Option<i32>,
     pub away: String,
     pub home: String,
     pub start_time: String,

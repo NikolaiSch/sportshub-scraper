@@ -7,6 +7,7 @@ pub mod schema;
 
 use std::error::Error;
 
+use diesel::SqliteConnection;
 use headless_chrome::Browser;
 
 #[derive(Debug)]
@@ -19,6 +20,8 @@ struct Game {
 }
 
 fn today_games() -> Result<(), Box<dyn Error>> {
+    let mut conn = db::establish_connection();
+
     let browser = Browser::new({
         headless_chrome::LaunchOptions {
             headless: false,
@@ -30,7 +33,8 @@ fn today_games() -> Result<(), Box<dyn Error>> {
 
     let tab = browser.new_tab()?;
 
-    tab.navigate_to("https://reddit.sportshub.fan/")?;
+    tab.navigate_to("https://reddit.sportshub.fan/")?
+        .wait_for_element(".list-events")?;
 
     let html = tab
         .find_element(".list-events")?
@@ -44,13 +48,16 @@ fn today_games() -> Result<(), Box<dyn Error>> {
     let dom_games = dom.get_elements_by_class_name("wrap-events-item");
 
     for game in dom_games {
-        parse_game(&game.get(parser).unwrap().inner_html(parser).to_string());
+        parse_game(
+            &mut conn,
+            &game.get(parser).unwrap().inner_html(parser).to_string(),
+        );
     }
 
     Ok(())
 }
 
-fn parse_game(html: &str) -> Game {
+fn parse_game(conn: &mut SqliteConnection, html: &str) -> Game {
     let dom = tl::parse(html, tl::ParserOptions::default()).unwrap();
     let parser = dom.parser();
 
@@ -113,9 +120,19 @@ fn parse_game(html: &str) -> Game {
     let time = info.clone().split("/").nth(1).unwrap().to_string();
     let league = info.clone().split("/").nth(0).unwrap().to_string();
 
-    // println!("{:?}", name);
-    // let home = name.split("-").nth(0).unwrap().to_string();
-    // let away = name.split("-").nth(1).unwrap().to_string();
+    let teams: Vec<&str> = name.split("–").collect();
+    let home = teams.first().unwrap().trim().to_string();
+    let away = teams.last().unwrap().trim().to_string();
+
+    let new_stream = models::StreamNew {
+        home: &home,
+        away: &away,
+        start_time: &time,
+        league: &league,
+        country: &country,
+    };
+
+    db::create_stream(conn, &new_stream);
 
     Game {
         url,
