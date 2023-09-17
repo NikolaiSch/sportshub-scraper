@@ -10,6 +10,9 @@ use std::error::Error;
 use diesel::SqliteConnection;
 use headless_chrome::Browser;
 
+pub mod streams {
+    include!(concat!(env!("OUT_DIR"), "/streams.rs"));
+}
 #[derive(Debug)]
 struct Game {
     url: String,
@@ -141,9 +144,4 @@ fn parse_game(conn: &mut SqliteConnection, html: &str) -> Game {
         league,
         country,
     }
-}
-fn main() -> Result<(), Box<dyn Error>> {
-    dbg!(today_games()?);
-
-    Ok(())
 }

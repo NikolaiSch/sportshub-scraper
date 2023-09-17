@@ -3,10 +3,10 @@ name = "sportshub_scraper"
 version = "0.1.0"
 edition = "2021"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 headless_chrome = "*"
 tl = "0.7.7"
 diesel = { version = "2.1.0", features = ["sqlite"] }
 anyhow = "1.0.75"
+juniper = "0.15.11"
