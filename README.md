@@ -4,6 +4,7 @@
    - Multiple tabs at same time
    - Batch SQLite writes
    - Fix advertisement causing delay
+   - Add RustDoc comments
      
 - To scrape, use `cargo run --release --bin scraper` in the root directory of the project
   - This will output to 'sports.db' in the root directory
