@@ -11,7 +11,7 @@ pub fn establish_connection() -> SqliteConnection {
 }
 
 pub fn create_stream(conn: &mut SqliteConnection, new_stream: &StreamNew) -> () {
-    diesel::insert_into(stream::table)
+    diesel::insert_or_ignore_into(stream::table)
         .values(new_stream)
         .execute(conn)
         .unwrap();

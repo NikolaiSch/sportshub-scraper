@@ -10,8 +10,8 @@ use std::error::Error;
 use diesel::SqliteConnection;
 use headless_chrome::Browser;
 
-pub mod streams {
-    include!(concat!(env!("OUT_DIR"), "/streams.rs"));
+fn main() {
+    today_games().unwrap();
 }
 #[derive(Debug)]
 struct Game {
@@ -120,8 +120,10 @@ fn parse_game(conn: &mut SqliteConnection, html: &str) -> Game {
         .replace(");", "")
         .replace(".svg", "");
 
-    let time = info.clone().split("/").nth(1).unwrap().to_string();
-    let league = info.clone().split("/").nth(0).unwrap().to_string();
+    let mut info_parsed = info.split("/");
+
+    let league = &info_parsed.next().unwrap().to_string();
+    let time = info_parsed.next().unwrap().to_string();
 
     let teams: Vec<&str> = name.split("–").collect();
     let home = teams.first().unwrap().trim().to_string();
@@ -141,7 +143,7 @@ fn parse_game(conn: &mut SqliteConnection, html: &str) -> Game {
         url,
         name,
         time,
-        league,
+        league: league.clone(),
         country,
     }
 }

@@ -1,7 +1,5 @@
 use diesel::prelude::*;
 
-use crate::schema::*;
-
 #[derive(Debug, Queryable)]
 pub struct Stream {
     pub id: Option<i32>,
