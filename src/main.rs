@@ -1,13 +1,15 @@
-#[macro_use]
-extern crate diesel;
-
 pub mod db;
 pub mod models;
 pub mod schema;
 
+#[macro_use]
+extern crate diesel;
 use std::error::Error;
 use std::ffi::OsStr;
 
+use axum::routing::get;
+use axum::routing::post;
+use axum::Router;
 use diesel::ExpressionMethods;
 use diesel::RunQueryDsl;
 use diesel::SqliteConnection;
@@ -15,8 +17,6 @@ use headless_chrome::Browser;
 use headless_chrome::Tab;
 
 fn main() {
-    let mut conn = db::establish_connection();
-
     let browser = Browser::new({
         headless_chrome::LaunchOptions {
             headless: false,
@@ -27,6 +27,8 @@ fn main() {
         }
     })
     .unwrap();
+
+    let mut conn = db::establish_connection();
 
     let tab = browser.new_tab().unwrap();
 
@@ -39,6 +41,7 @@ fn main() {
         t.close(true).unwrap();
     }
 }
+
 #[derive(Debug)]
 struct Game {
     url: String,
@@ -164,12 +167,17 @@ fn parse_game(conn: &mut SqliteConnection, html: &str) -> Game {
 }
 
 fn url_to_links(tab: &Tab, url: &str, conn: &mut SqliteConnection) -> Result<(), Box<dyn Error>> {
-    tab.navigate_to(url)?.wait_for_element("#links_block")?;
+    tab.navigate_to(url)?.wait_for_element("div")?;
 
     let u = urlencoding::decode(url).unwrap();
 
-    let stream_links: Vec<String> = tab
-        .find_elements("#links_block table a")?
+    let elements = tab.find_elements("#links_block table a");
+
+    if elements.is_err() {
+        return Ok(());
+    };
+    let stream_links: Vec<String> = elements
+        .unwrap()
         .into_iter()
         .map(|e| e.get_attributes().unwrap().unwrap().get(1).unwrap().clone())
         .filter(|e| e.contains("//"))
