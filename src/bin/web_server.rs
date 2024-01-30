@@ -1,23 +1,19 @@
-#[macro_use]
-extern crate diesel;
-
-use std::error::Error;
-use std::ffi::OsStr;
-
-use axum::routing::get;
-use axum::routing::post;
-use axum::Router;
-use diesel::ExpressionMethods;
-use diesel::RunQueryDsl;
-use diesel::SqliteConnection;
-use headless_chrome::Browser;
-use headless_chrome::Tab;
+use axum::{routing::get, Json, Router};
+use scraper::{db, models::Stream};
 
 #[tokio::main]
 async fn main() {
-    let app = Router::new();
-    // `GET /` goes to `root`
+    // build our application with a single route
+    let app = Router::new().route("/", get(get_all_streams));
 
     // run our app with hyper, listening globally on port 3000
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
+    axum::serve(listener, app).await.unwrap();
+}
+
+async fn get_all_streams() -> Json<Vec<Stream>> {
+    let mut conn = db::establish_connection();
+    let streams = db::get_streams(&mut conn);
+
+    Json(streams)
 }

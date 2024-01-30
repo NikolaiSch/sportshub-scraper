@@ -1,6 +1,8 @@
 use diesel::prelude::*;
+use serde::Deserialize;
+use serde::Serialize;
 
-#[derive(Debug, Queryable)]
+#[derive(Debug, Queryable, Serialize, Deserialize)]
 pub struct Stream {
     pub id: Option<i32>,
     pub away: String,

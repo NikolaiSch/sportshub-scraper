@@ -1339,6 +1339,7 @@ dependencies = [
  "diesel",
  "headless_chrome",
  "juniper",
+ "serde",
  "tl",
  "tokio",
  "urlencoding",

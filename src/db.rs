@@ -28,3 +28,10 @@ pub fn get_empty_streams(conn: &mut SqliteConnection) -> Vec<Stream> {
         .load::<Stream>(conn)
         .expect("Error loading streams")
 }
+
+pub fn get_linked_streams(conn: &mut SqliteConnection) -> Vec<Stream> {
+    stream
+        .filter(schema::stream::stream_link.ne(""))
+        .load::<Stream>(conn)
+        .expect("Error loading streams")
+}
