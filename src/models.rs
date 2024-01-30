@@ -8,6 +8,8 @@ pub struct Stream {
     pub start_time: String,
     pub league: String,
     pub country: String,
+    pub url: String,
+    pub stream_link: String,
 }
 
 #[derive(Debug, Insertable)]
@@ -18,4 +20,6 @@ pub struct StreamNew<'a> {
     pub start_time: &'a str,
     pub league: &'a str,
     pub country: &'a str,
+    pub url: &'a str,
+    pub stream_link: &'a str,
 }

@@ -6,12 +6,38 @@ pub mod models;
 pub mod schema;
 
 use std::error::Error;
+use std::ffi::OsStr;
 
+use diesel::ExpressionMethods;
+use diesel::RunQueryDsl;
 use diesel::SqliteConnection;
 use headless_chrome::Browser;
+use headless_chrome::Tab;
 
 fn main() {
-    today_games().unwrap();
+    let mut conn = db::establish_connection();
+
+    let browser = Browser::new({
+        headless_chrome::LaunchOptions {
+            headless: false,
+            sandbox: true,
+            ignore_certificate_errors: true,
+            extensions: vec![OsStr::new("./chrome-ext/adblock")],
+            ..Default::default()
+        }
+    })
+    .unwrap();
+
+    let tab = browser.new_tab().unwrap();
+
+    today_games(&tab, &mut conn).unwrap();
+    url_to_links(&tab,"https://reddit3.sportshub.stream/event/s%D0%B0ud%D1%96_%D0%B0r%D0%B0b%D1%96%D0%B0_s%D0%B0u_s%D0%BEuth_k%D0%BEr%D0%B5%D0%B0_k%D0%BEr_189842032/", &mut conn).unwrap();
+
+    check_links(&tab, &mut conn).unwrap();
+
+    for t in (*browser.get_tabs().as_ref().lock().unwrap()).iter() {
+        t.close(true).unwrap();
+    }
 }
 #[derive(Debug)]
 struct Game {
@@ -22,20 +48,7 @@ struct Game {
     country: String,
 }
 
-fn today_games() -> Result<(), Box<dyn Error>> {
-    let mut conn = db::establish_connection();
-
-    let browser = Browser::new({
-        headless_chrome::LaunchOptions {
-            headless: false,
-            sandbox: true,
-            ignore_certificate_errors: true,
-            ..Default::default()
-        }
-    })?;
-
-    let tab = browser.new_tab()?;
-
+fn today_games(tab: &Tab, conn: &mut SqliteConnection) -> Result<(), Box<dyn Error>> {
     tab.navigate_to("https://reddit.sportshub.fan/")?
         .wait_for_element(".list-events")?;
 
@@ -52,7 +65,7 @@ fn today_games() -> Result<(), Box<dyn Error>> {
 
     for game in dom_games {
         parse_game(
-            &mut conn,
+            conn,
             &game.get(parser).unwrap().inner_html(parser).to_string(),
         );
     }
@@ -135,6 +148,8 @@ fn parse_game(conn: &mut SqliteConnection, html: &str) -> Game {
         start_time: &time,
         league: &league,
         country: &country,
+        url: &url,
+        stream_link: "",
     };
 
     db::create_stream(conn, &new_stream);
@@ -146,4 +161,36 @@ fn parse_game(conn: &mut SqliteConnection, html: &str) -> Game {
         league: league.clone(),
         country,
     }
+}
+
+fn url_to_links(tab: &Tab, url: &str, conn: &mut SqliteConnection) -> Result<(), Box<dyn Error>> {
+    tab.navigate_to(url)?.wait_for_element("#links_block")?;
+
+    let u = urlencoding::decode(url).unwrap();
+
+    let stream_links: Vec<String> = tab
+        .find_elements("#links_block table a")?
+        .into_iter()
+        .map(|e| e.get_attributes().unwrap().unwrap().get(1).unwrap().clone())
+        .filter(|e| e.contains("//"))
+        .collect();
+
+    diesel::update(schema::stream::table)
+        .set(schema::stream::stream_link.eq(stream_links.join(",")))
+        .filter(schema::stream::url.eq(u))
+        .execute(conn)
+        .unwrap();
+    Ok(())
+}
+
+fn check_links(tab: &Tab, conn: &mut SqliteConnection) -> Result<(), Box<dyn Error>> {
+    let streams = db::get_empty_streams(conn);
+
+    for stream in streams {
+        if stream.stream_link == "" {
+            url_to_links(tab, &stream.url, conn)?;
+        }
+    }
+
+    Ok(())
 }

@@ -5,5 +5,7 @@ CREATE TABLE "stream" (
     start_time TEXT NOT NULL,
     league TEXT NOT NULL,
     country TEXT NOT NULL,
-    UNIQUE(home, away, start_time)
+    url TEXT NOT NULL,
+    stream_link TEXT NOT NULL,
+    UNIQUE(url, home, away, start_time)
 );

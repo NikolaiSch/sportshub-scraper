@@ -10,3 +10,4 @@ tl = "0.7.8"
 diesel = { version = "2.1.1", features = ["sqlite"] }
 anyhow = "1.0.79"
 juniper = "0.15.12"
+urlencoding = "2.1.3"

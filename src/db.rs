@@ -1,6 +1,7 @@
 use diesel::prelude::*;
 
 use crate::models::*;
+use crate::schema;
 use crate::schema::stream;
 use crate::schema::stream::dsl::*;
 
@@ -19,4 +20,11 @@ pub fn create_stream(conn: &mut SqliteConnection, new_stream: &StreamNew) -> () 
 
 pub fn get_streams(conn: &mut SqliteConnection) -> Vec<Stream> {
     stream.load::<Stream>(conn).expect("Error loading streams")
+}
+
+pub fn get_empty_streams(conn: &mut SqliteConnection) -> Vec<Stream> {
+    stream
+        .filter(schema::stream::stream_link.eq(""))
+        .load::<Stream>(conn)
+        .expect("Error loading streams")
 }

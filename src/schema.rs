@@ -8,5 +8,7 @@ diesel::table! {
         start_time -> Text,
         league -> Text,
         country -> Text,
+        url -> Text,
+        stream_link -> Text,
     }
 }
