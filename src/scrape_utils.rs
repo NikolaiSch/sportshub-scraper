@@ -67,61 +67,30 @@ pub fn parse_game(conn: &mut SqliteConnection, html: &str) -> Result<(), Box<dyn
 
     // we get the url of the game
     // since there are no other links in the div
+    // format is: <a href="https://reddit3.sportshub.stream/event/tоttеnhаm_brеntfоrd_187734226/">
+
     let url = query_selectors::get_url_from_dom(&dom, parser)?;
+
     // we get the name of the game
     // format is: <span class="mr-5">HomeTeam - AwayTeam</span>
-    let name = dom
-        .query_selector("span.mr-5")
-        .unwrap()
-        .next()
-        .unwrap()
-        .get(parser)
-        .unwrap()
-        .inner_text(parser)
-        .to_string();
+    let name = query_selectors::get_game_name_from_dom(&dom, parser)?;
 
     let teams: Vec<&str> = name.split('–').collect();
-    let home = teams.first().unwrap().trim().to_string();
-    let away = teams.last().unwrap().trim().to_string();
+    let home = teams.first().unwrap_or(&"???").trim().to_string();
+    let away = teams.last().unwrap_or(&"???").trim().to_string();
 
     // we get the info of the game, such as time, league, country
     // format is: <span class="evdesc event-desc">League / Time</span>
-    let info = dom
-        .query_selector("span.evdesc.event-desc")
-        .unwrap()
-        .next()
-        .unwrap()
-        .get(parser)
-        .unwrap()
-        .inner_text(parser)
-        .to_string();
+    let info = query_selectors::get_info_from_dom(&dom, parser)?;
 
     // we split the info into league and time
     let mut info_parsed = info.split('/');
-    let league = &info_parsed.next().unwrap().to_string();
-    let time = info_parsed.next().unwrap().to_string();
+    let league = &info_parsed.next().unwrap_or("Unknown").to_string();
+    let time = info_parsed.next().unwrap_or("Unknown").to_string();
 
     // we get the country of the game
     // format is: <i class="icon-competitions" style="background-image: url(https://reddit.sportshub.fan/img/competitions/england.svg);"></i>
-    let country = dom
-        .query_selector("i.icon-competitions")
-        .unwrap()
-        .next()
-        .unwrap()
-        .get(parser)
-        .unwrap()
-        .as_tag()
-        .unwrap()
-        .attributes()
-        .get("style")
-        .unwrap()
-        .unwrap()
-        .as_utf8_str()
-        .split('/')
-        .last()
-        .unwrap()
-        .replace(");", "")
-        .replace(".svg", "");
+    let country = query_selectors::get_country_from_dom(&dom, parser)?;
 
     // we create a new stream and save it to database
     // we leave stream_link empty for now
