@@ -1,3 +1,6 @@
+//! This module contains the web server for the API.
+//! It uses the rocket framework.
+
 use crate::{db, models::Stream};
 use rocket::{get, routes, serde::json::Json, Rocket};
 

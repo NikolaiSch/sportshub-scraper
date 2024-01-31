@@ -1,3 +1,5 @@
+//! This module contains the models for the diesel ORM
+
 use diesel::prelude::*;
 use serde::ser::SerializeStruct;
 use serde::Deserialize;

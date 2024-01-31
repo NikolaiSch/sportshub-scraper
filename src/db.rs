@@ -1,3 +1,5 @@
+//! Database operation helpers for sqlite, using diesel
+
 use diesel::prelude::*;
 
 use crate::models::*;

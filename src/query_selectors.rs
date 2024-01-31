@@ -1,4 +1,5 @@
-use std::error::Error;
+//! This module contains the functions to get the data from the dom of the eventlist
+//! and return the data as a string
 
 use tl::Parser;
 use tl::VDom;
