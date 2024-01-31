@@ -13,6 +13,7 @@
   - [ ] Add CI
   - [ ] remove `unwrap()`s
   - [ ] Store Timestamps instead of strings
+  - [ ] Other sports
 
 - to install use the following commands
 
