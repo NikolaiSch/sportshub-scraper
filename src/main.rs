@@ -4,15 +4,14 @@
 
 #[macro_use]
 extern crate rocket;
+#[macro_use]
+extern crate diesel;
 
 const OPEN_TABS: usize = 10;
 
 pub mod db;
 pub mod models;
 pub mod schema;
-
-#[macro_use]
-extern crate diesel;
 
 use scraper::scrape_utils::start_scraping;
 
