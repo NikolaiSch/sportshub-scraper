@@ -276,13 +276,12 @@ pub fn check_link(
 }
 
 pub fn start_scraping(open_tabs: usize) {
-    // we use it headful for now, because headless chrome doesn't support extensions
+    // realised we didnt need adblocker when headless
     let browser = Browser::new({
         headless_chrome::LaunchOptions {
-            headless: false,
+            headless: true,
             sandbox: true,
             ignore_certificate_errors: true,
-            extensions: vec![OsStr::new("./chrome-ext/adblock")],
             ..Default::default()
         }
     })
