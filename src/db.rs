@@ -37,3 +37,10 @@ pub fn get_linked_streams(conn: &mut SqliteConnection) -> Vec<Stream> {
         .load::<Stream>(conn)
         .expect("Error loading streams")
 }
+
+pub fn get_streams_by_id(conn: &mut SqliteConnection, search_id: i32) -> Vec<Stream> {
+    stream
+        .filter(schema::stream::id.eq(search_id))
+        .load::<Stream>(conn)
+        .expect("Error loading streams")
+}

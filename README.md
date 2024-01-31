@@ -32,8 +32,12 @@
 
   # to run the http api use
   sportshub server
+
+  # to run on custom port use
+  sportshub server -p <PORT>
   ```
 
 - server has the following urls:
 - `/` - returns all scraped data
 - `/active` - returns all links with active streams (with links to the streams)
+- `/id/<id>` - returns the data for the given id

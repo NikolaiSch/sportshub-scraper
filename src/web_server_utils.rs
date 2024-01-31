@@ -1,32 +1,40 @@
 use crate::{db, models::Stream};
-use axum::{routing::get, Json, Router};
+use rocket::{get, launch, routes, serde::json::Json, Rocket};
 
-pub async fn run(port: u16) {
-    // build our application with a single route
-    let app = Router::new()
-        .route("/", get(get_all_streams))
-        .route("/active", get(get_active_streams));
-
-    let host = format!("0.0.0.0:{}", port);
-
-    // run our app with hyper, listening globally on port 3000
-    let listener = tokio::net::TcpListener::bind(host).await.unwrap();
-    println!("Listening on http://localhost:{}", port);
-    axum::serve(listener, app).await.unwrap();
-}
-
+#[get("/")]
 async fn get_all_streams() -> Json<Vec<Stream>> {
-    println!("get_all_streams");
     let mut conn = db::establish_connection();
     let streams = db::get_streams(&mut conn);
 
     Json(streams)
 }
 
+#[get("/active")]
 async fn get_active_streams() -> Json<Vec<Stream>> {
-    println!("get_active_streams");
     let mut conn = db::establish_connection();
     let streams = db::get_linked_streams(&mut conn);
 
     Json(streams)
+}
+
+#[get("/id/<id>")]
+async fn get_stream_by_id(id: i32) -> Json<Vec<Stream>> {
+    let mut conn = db::establish_connection();
+    let streams = db::get_streams_by_id(&mut conn, id);
+
+    Json(streams)
+}
+
+pub async fn run(port: u16) {
+    Rocket::custom(rocket::Config {
+        port,
+        ..Default::default()
+    })
+    .mount(
+        "/",
+        routes![get_all_streams, get_active_streams, get_stream_by_id],
+    )
+    .launch()
+    .await
+    .unwrap();
 }

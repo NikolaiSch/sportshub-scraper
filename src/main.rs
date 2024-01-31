@@ -2,6 +2,9 @@
 //! and save them to database.  It also checks the stream links and saves them
 //! to database.
 
+#[macro_use]
+extern crate rocket;
+
 const OPEN_TABS: usize = 10;
 
 pub mod db;
