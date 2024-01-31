@@ -1,6 +1,6 @@
 #![feature(slice_take)]
 
-const OPEN_TABS: usize = 3;
+const OPEN_TABS: usize = 10;
 
 pub mod db;
 pub mod models;
@@ -187,17 +187,24 @@ fn check_all_links(browser: &Browser, conn: &mut SqliteConnection) -> Result<(),
     let chunked_streams: Vec<&[models::Stream]> =
         all_streams.chunks(all_streams.len() / OPEN_TABS).collect();
 
+    let length = all_streams.len();
+
     let mut tabs: Vec<Arc<Tab>> = vec![];
     let mut threads = vec![];
+    let mut completed_mutex = Arc::new(Mutex::new(0));
     for tab_num in 0..OPEN_TABS {
         let tab = browser.new_tab().unwrap();
         tabs.push(tab.clone());
         let mut streams = chunked_streams.get(tab_num).unwrap().to_vec().clone();
+        let completed = completed_mutex.clone();
 
         threads.push(thread::spawn(move || {
             let mut conn = db::establish_connection();
             while let Some(stream) = streams.pop() {
                 check_link(tab.clone().borrow_mut(), &mut conn, &stream.url).unwrap();
+                let mut completed_count = completed.lock().unwrap();
+                *completed_count += 1;
+                println!("{} / {}", completed_count, length);
             }
         }));
     }
