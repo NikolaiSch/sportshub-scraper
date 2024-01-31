@@ -4,6 +4,7 @@ use crate::models::*;
 use crate::schema;
 use crate::schema::stream;
 use crate::schema::stream::dsl::*;
+use diesel::RunQueryDsl;
 
 pub fn establish_connection() -> SqliteConnection {
     let database_url = "sports.db";

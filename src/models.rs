@@ -15,7 +15,7 @@ pub struct Stream {
     pub stream_link: String,
 }
 
-#[derive(Debug, Insertable)]
+#[derive(Debug, Insertable, Deserialize, Clone)]
 #[diesel(table_name = crate::schema::stream)]
 pub struct StreamNew<'a> {
     pub home: &'a str,
