@@ -10,7 +10,7 @@
   - [x] Add RustDoc comments
   - [x] Create cli
   - [ ] Add tests
-  - [ ] Add CI
+  - [x] Add CI
   - [ ] remove `unwrap()`s
   - [ ] Store Timestamps instead of strings
   - [ ] Other sports
