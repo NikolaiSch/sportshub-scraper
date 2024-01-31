@@ -4,7 +4,7 @@
 
 use std::borrow::BorrowMut;
 use std::error::Error;
-use std::ffi::OsStr;
+
 use std::sync::Arc;
 use std::sync::Mutex;
 use std::thread;
@@ -34,8 +34,7 @@ pub fn today_games(tab: &Tab, conn: &mut SqliteConnection) -> Result<(), Box<dyn
     let html = tab
         .find_element(".list-events")?
         .get_content()?
-        .replace("\t", "")
-        .replace("\n", "");
+        .replace(['\t', '\n'], "");
 
     // create the parser using tl
     let dom = tl::parse(&html, tl::ParserOptions::default()).unwrap();
@@ -46,10 +45,7 @@ pub fn today_games(tab: &Tab, conn: &mut SqliteConnection) -> Result<(), Box<dyn
 
     // we iterate over all the games and parse them
     for game in dom_games {
-        parse_game(
-            conn,
-            &game.get(parser).unwrap().inner_html(parser).to_string(),
-        )?;
+        parse_game(conn, game.get(parser).unwrap().inner_html(parser).as_ref())?;
     }
 
     Ok(())
@@ -95,7 +91,7 @@ pub fn parse_game(conn: &mut SqliteConnection, html: &str) -> Result<(), Box<dyn
         .inner_text(parser)
         .to_string();
 
-    let teams: Vec<&str> = name.split("–").collect();
+    let teams: Vec<&str> = name.split('–').collect();
     let home = teams.first().unwrap().trim().to_string();
     let away = teams.last().unwrap().trim().to_string();
 
@@ -112,7 +108,7 @@ pub fn parse_game(conn: &mut SqliteConnection, html: &str) -> Result<(), Box<dyn
         .to_string();
 
     // we split the info into league and time
-    let mut info_parsed = info.split("/");
+    let mut info_parsed = info.split('/');
     let league = &info_parsed.next().unwrap().to_string();
     let time = info_parsed.next().unwrap().to_string();
 
@@ -132,7 +128,7 @@ pub fn parse_game(conn: &mut SqliteConnection, html: &str) -> Result<(), Box<dyn
         .unwrap()
         .unwrap()
         .as_utf8_str()
-        .split("/")
+        .split('/')
         .last()
         .unwrap()
         .replace(");", "")
@@ -144,7 +140,7 @@ pub fn parse_game(conn: &mut SqliteConnection, html: &str) -> Result<(), Box<dyn
         home: &home,
         away: &away,
         start_time: &time,
-        league: &league,
+        league,
         country: &country,
         url: &url,
         stream_link: "",

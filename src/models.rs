@@ -32,7 +32,7 @@ impl Serialize for Stream {
     where
         S: serde::ser::Serializer,
     {
-        let split_streams: Vec<&str> = self.stream_link.split(",").collect();
+        let split_streams: Vec<&str> = self.stream_link.split(',').collect();
         let mut stream = serializer.serialize_struct("Stream", 8)?;
         stream.serialize_field("id", &self.id)?;
         stream.serialize_field("home", &self.home)?;

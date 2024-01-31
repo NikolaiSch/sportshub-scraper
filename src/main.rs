@@ -8,21 +8,11 @@ pub mod db;
 pub mod models;
 pub mod schema;
 
-#[macro_use]
 extern crate diesel;
-use std::borrow::BorrowMut;
-use std::error::Error;
-use std::ffi::OsStr;
-use std::sync::Arc;
-use std::sync::Mutex;
-use std::thread;
 
-use diesel::ExpressionMethods;
-use diesel::RunQueryDsl;
-use diesel::SqliteConnection;
 use headless_chrome::Browser;
-use headless_chrome::Tab;
 use scraper::scrape;
+use std::ffi::OsStr;
 
 fn main() {
     // we use it headful for now, because headless chrome doesn't support extensions

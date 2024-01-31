@@ -8,11 +8,11 @@ use diesel::RunQueryDsl;
 
 pub fn establish_connection() -> SqliteConnection {
     let database_url = "sports.db";
-    SqliteConnection::establish(&database_url)
+    SqliteConnection::establish(database_url)
         .unwrap_or_else(|_| panic!("Error connecting to {}", database_url))
 }
 
-pub fn create_stream(conn: &mut SqliteConnection, new_stream: &StreamNew) -> () {
+pub fn create_stream(conn: &mut SqliteConnection, new_stream: &StreamNew) {
     diesel::insert_or_ignore_into(stream::table)
         .values(new_stream)
         .execute(conn)
