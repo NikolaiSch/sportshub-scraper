@@ -28,7 +28,7 @@
   ```bash
   sportshub
 
-  # to scrape use, where <T> is number of simultaneous tabs
+  # to scrape use, where <T> is number of simultaneous tabs (defaults to 10)
   sportshub scrape <T>
 
   # to run the http api use
