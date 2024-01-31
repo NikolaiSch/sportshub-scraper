@@ -1,5 +1,5 @@
 # This is a scraper for sportshub, which also gets active links from the website
-
+[![Rust](https://github.com/NikolaiSch/sportshub-scraper/actions/workflows/rust.yml/badge.svg?branch=main)](https://github.com/NikolaiSch/sportshub-scraper/actions/workflows/rust.yml)
 ## Very much in progress
 
 - Todo
