@@ -16,5 +16,6 @@ pub mod schema;
 use scraper::scrape_utils::start_scraping;
 
 fn main() {
-    start_scraping(OPEN_TABS);
+    // This should be the only place it can panic
+    start_scraping(OPEN_TABS).unwrap();
 }
