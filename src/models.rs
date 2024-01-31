@@ -3,7 +3,7 @@ use serde::ser::SerializeStruct;
 use serde::Deserialize;
 use serde::Serialize;
 
-#[derive(Debug, Queryable, Deserialize)]
+#[derive(Debug, Queryable, Deserialize, Clone)]
 pub struct Stream {
     pub id: Option<i32>,
     pub away: String,

@@ -1,15 +1,21 @@
+#![feature(slice_take)]
+
+const OPEN_TABS: usize = 3;
+
 pub mod db;
 pub mod models;
 pub mod schema;
 
 #[macro_use]
 extern crate diesel;
+use std::borrow::BorrowMut;
+use std::collections::VecDeque;
 use std::error::Error;
 use std::ffi::OsStr;
+use std::sync::Arc;
+use std::sync::Mutex;
+use std::thread;
 
-use axum::routing::get;
-use axum::routing::post;
-use axum::Router;
 use diesel::ExpressionMethods;
 use diesel::RunQueryDsl;
 use diesel::SqliteConnection;
@@ -33,22 +39,12 @@ fn main() {
     let tab = browser.new_tab().unwrap();
 
     today_games(&tab, &mut conn).unwrap();
-    url_to_links(&tab,"https://reddit3.sportshub.stream/event/s%D0%B0ud%D1%96_%D0%B0r%D0%B0b%D1%96%D0%B0_s%D0%B0u_s%D0%BEuth_k%D0%BEr%D0%B5%D0%B0_k%D0%BEr_189842032/", &mut conn).unwrap();
 
-    check_links(&tab, &mut conn).unwrap();
+    check_all_links(&browser, &mut conn).unwrap();
 
     for t in (*browser.get_tabs().as_ref().lock().unwrap()).iter() {
         t.close(true).unwrap();
     }
-}
-
-#[derive(Debug)]
-struct Game {
-    url: String,
-    name: String,
-    time: String,
-    league: String,
-    country: String,
 }
 
 fn today_games(tab: &Tab, conn: &mut SqliteConnection) -> Result<(), Box<dyn Error>> {
@@ -70,13 +66,13 @@ fn today_games(tab: &Tab, conn: &mut SqliteConnection) -> Result<(), Box<dyn Err
         parse_game(
             conn,
             &game.get(parser).unwrap().inner_html(parser).to_string(),
-        );
+        )?;
     }
 
     Ok(())
 }
 
-fn parse_game(conn: &mut SqliteConnection, html: &str) -> Game {
+fn parse_game(conn: &mut SqliteConnection, html: &str) -> Result<(), Box<dyn Error>> {
     let dom = tl::parse(html, tl::ParserOptions::default()).unwrap();
     let parser = dom.parser();
 
@@ -157,17 +153,11 @@ fn parse_game(conn: &mut SqliteConnection, html: &str) -> Game {
 
     db::create_stream(conn, &new_stream);
 
-    Game {
-        url,
-        name,
-        time,
-        league: league.clone(),
-        country,
-    }
+    Ok(())
 }
 
-fn url_to_links(tab: &Tab, url: &str, conn: &mut SqliteConnection) -> Result<(), Box<dyn Error>> {
-    tab.navigate_to(url)?.wait_for_element("div")?;
+fn url_to_links(tab: &Tab, conn: &mut SqliteConnection, url: &str) -> Result<(), Box<dyn Error>> {
+    tab.navigate_to(url).unwrap();
 
     let u = urlencoding::decode(url).unwrap();
 
@@ -191,14 +181,40 @@ fn url_to_links(tab: &Tab, url: &str, conn: &mut SqliteConnection) -> Result<(),
     Ok(())
 }
 
-fn check_links(tab: &Tab, conn: &mut SqliteConnection) -> Result<(), Box<dyn Error>> {
-    let streams = db::get_empty_streams(conn);
+fn check_all_links(browser: &Browser, conn: &mut SqliteConnection) -> Result<(), Box<dyn Error>> {
+    let all_streams = Arc::new(db::get_empty_streams(conn));
 
-    for stream in streams {
-        if stream.stream_link == "" {
-            url_to_links(tab, &stream.url, conn)?;
-        }
+    let chunked_streams: Vec<&[models::Stream]> =
+        all_streams.chunks(all_streams.len() / OPEN_TABS).collect();
+
+    let mut tabs: Vec<Arc<Tab>> = vec![];
+    let mut threads = vec![];
+    for tab_num in 0..OPEN_TABS {
+        let tab = browser.new_tab().unwrap();
+        tabs.push(tab.clone());
+        let mut streams = chunked_streams.get(tab_num).unwrap().to_vec().clone();
+
+        threads.push(thread::spawn(move || {
+            let mut conn = db::establish_connection();
+            while let Some(stream) = streams.pop() {
+                check_link(tab.clone().borrow_mut(), &mut conn, &stream.url).unwrap();
+            }
+        }));
     }
+
+    for t in threads {
+        t.join().unwrap();
+    }
+
+    Ok(())
+}
+
+fn check_link(
+    tab: &mut Arc<Tab>,
+    conn: &mut SqliteConnection,
+    link: &str,
+) -> Result<(), Box<dyn Error>> {
+    url_to_links(tab.borrow_mut(), conn.borrow_mut(), link).unwrap();
 
     Ok(())
 }
