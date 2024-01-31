@@ -88,4 +88,24 @@ mod tests {
             "{\"id\":1,\"home\":\"home\",\"away\":\"away\",\"start_time\":\"start_time\",\"league\":\"league\",\"country\":\"country\",\"url\":\"url\",\"stream_link\":[\"stream_link\",\"stream_link2\"]}"
         );
     }
+
+    #[test]
+    fn test_serialise_streamlink_empty() {
+        let stream = Stream {
+            id: Some(1),
+            home: "home".to_string(),
+            away: "away".to_string(),
+            start_time: "start_time".to_string(),
+            league: "league".to_string(),
+            country: "country".to_string(),
+            url: "url".to_string(),
+            stream_link: "".to_string(),
+        };
+
+        let serialised = serde_json::to_string(&stream).unwrap();
+        assert_eq!(
+            serialised,
+            "{\"id\":1,\"home\":\"home\",\"away\":\"away\",\"start_time\":\"start_time\",\"league\":\"league\",\"country\":\"country\",\"url\":\"url\",\"stream_link\":[]}"
+        );
+    }
 }
