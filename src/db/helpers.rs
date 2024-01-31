@@ -2,12 +2,12 @@
 
 use diesel::prelude::*;
 
-use crate::models::*;
-use crate::schema::{
-    self,
-    stream::{self, dsl::*},
-};
 use diesel::RunQueryDsl;
+
+use super::models::{Stream, StreamNew};
+use super::schema;
+use super::schema::stream;
+use super::schema::stream::dsl::*;
 
 pub fn establish_connection() -> Result<SqliteConnection, anyhow::Error> {
     let database_url = format!("{}/sports.db", std::env::temp_dir().display());

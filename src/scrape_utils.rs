@@ -2,9 +2,7 @@
 //! and save them to database.  It also checks the stream links and saves them
 //! to database.
 
-use std::any;
 use std::borrow::BorrowMut;
-use std::error::Error;
 
 use std::sync::Arc;
 use std::sync::Mutex;
@@ -18,9 +16,9 @@ use headless_chrome::Browser;
 use headless_chrome::Tab;
 
 use crate::db;
-use crate::models;
 use crate::query_selectors;
-use crate::schema;
+use db::models;
+use db::schema;
 
 /// This function scrapes all the games from the home page and saves them to database.
 /// It takes roughly 1 second to scrape ~500 games.
@@ -108,7 +106,7 @@ pub fn parse_game(conn: &mut SqliteConnection, html: &str) -> Result<(), anyhow:
         stream_link: "",
     };
 
-    db::create_stream(conn, &new_stream)?;
+    db::helpers::create_stream(conn, &new_stream)?;
 
     let time_end = std::time::Instant::now();
     println!("Time elapsed to parse a game: {:?}", time_end - time_start);
@@ -175,7 +173,7 @@ pub fn check_all_links(
 ) -> Result<(), anyhow::Error> {
     // we get all the streams from database that have no links
     // wrap it in an arc to share it between threads
-    let all_streams = Arc::new(db::get_empty_streams(conn)?);
+    let all_streams = Arc::new(db::helpers::get_empty_streams(conn)?);
 
     // we split the streams into chunks and create a thread for each chunk
     let chunked_streams: Vec<&[models::Stream]> =
@@ -206,7 +204,7 @@ pub fn check_all_links(
 
         threads.push(thread::spawn(move || {
             // sqlite should be able to handle 10 connections at once
-            let mut conn = db::establish_connection().unwrap();
+            let mut conn = db::helpers::establish_connection().unwrap();
 
             // we iterate over all the streams and check them
             while let Some(stream) = streams.pop() {
@@ -259,7 +257,7 @@ pub fn start_scraping(open_tabs: usize) -> Result<(), anyhow::Error> {
         }
     })?;
 
-    let mut conn = db::establish_connection()?;
+    let mut conn = db::helpers::establish_connection()?;
 
     let tab = browser.new_tab()?;
 
