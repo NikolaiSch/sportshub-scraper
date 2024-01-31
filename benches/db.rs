@@ -10,6 +10,27 @@ fn criterion_benchmark(c: &mut Criterion) {
     c.bench_function("Create new db connection", |b| {
         b.iter(|| create_connection())
     });
+
+    // 228.3 nano seconds
+    c.bench_function("Create a new record", |b| {
+        let mut conn = db::establish_connection();
+        let new_stream = scraper::models::StreamNew {
+            away: "Away",
+            home: "Home",
+            league: "League",
+            country: "Country",
+            start_time: "Start Time",
+            url: "Url",
+            stream_link: "https://www.test.com",
+        };
+        b.iter(|| db::create_stream(&mut conn, &new_stream))
+    });
+
+    // 356 nano seconds
+    c.bench_function("Get all streams", |b| {
+        let mut conn = db::establish_connection();
+        b.iter(|| db::get_streams(&mut conn))
+    });
 }
 
 criterion_group!(benches, criterion_benchmark);
