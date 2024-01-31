@@ -38,14 +38,14 @@ enum Commands {
 
 #[tokio::main]
 async fn main() {
-    let mut conn = db::establish_connection();
+    let mut conn = db::establish_connection().unwrap();
 
     let cli = Cli::parse();
 
     match cli.command {
         Some(Commands::Parse { tabs }) => {
             run_migrations(&mut conn).unwrap();
-            scrape_utils::start_scraping(tabs);
+            scrape_utils::start_scraping(tabs).unwrap();
         }
         Some(Commands::Server { port }) => {
             web_server_utils::run(port).await;
