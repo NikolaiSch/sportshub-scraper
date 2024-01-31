@@ -15,6 +15,10 @@ use scraper::scrape;
 use std::ffi::OsStr;
 
 fn main() {
+    scrape(OPEN_TABS);
+}
+
+fn scrape(open_tabs: usize) {
     // we use it headful for now, because headless chrome doesn't support extensions
     let browser = Browser::new({
         headless_chrome::LaunchOptions {
@@ -43,7 +47,7 @@ fn main() {
     // takes ~27 seconds to scan everything
     // however can improve by using a shared queue instead of splitting it
     // so... TODO!
-    scrape::check_all_links(&browser, &mut conn, OPEN_TABS).unwrap();
+    scrape::check_all_links(&browser, &mut conn, open_tabs).unwrap();
 
     // we close all the tabs because otherwise it shows an error when program
     // finishes

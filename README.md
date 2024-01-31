@@ -7,7 +7,8 @@
   - [x] Multiple tabs at same time
   - [x] Batch SQLite writes
   - [x] Fix advertisement causing delay
-  - [ ] Add RustDoc comments
+  - [x] Add RustDoc comments
+  - [ ] Create cli
   - [ ] Add tests
   - [ ] Add CI
   - [ ] remove `unwrap()`s
