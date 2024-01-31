@@ -10,10 +10,10 @@ pub mod schema;
 
 extern crate diesel;
 
-use headless_chrome::Browser;
-use scraper::scrape_utils;
+
+
 use scraper::scrape_utils::start_scraping;
-use std::ffi::OsStr;
+
 
 fn main() {
     start_scraping(OPEN_TABS);

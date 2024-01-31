@@ -1,6 +1,6 @@
 use anyhow::Error;
 use clap::{Parser, Subcommand};
-use diesel::{migration::MigrationConnection, sqlite::Sqlite, SqliteConnection};
+use diesel::{sqlite::Sqlite};
 use diesel_migrations::{embed_migrations, EmbeddedMigrations, MigrationHarness};
 use scraper::{db, scrape_utils, web_server_utils};
 
