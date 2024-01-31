@@ -1,9 +1,10 @@
 use diesel::prelude::*;
 
 use crate::models::*;
-use crate::schema;
-use crate::schema::stream;
-use crate::schema::stream::dsl::*;
+use crate::schema::{
+    self,
+    stream::{self, dsl::*},
+};
 use diesel::RunQueryDsl;
 
 pub fn establish_connection() -> SqliteConnection {

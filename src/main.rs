@@ -8,12 +8,10 @@ pub mod db;
 pub mod models;
 pub mod schema;
 
+#[macro_use]
 extern crate diesel;
 
-
-
 use scraper::scrape_utils::start_scraping;
-
 
 fn main() {
     start_scraping(OPEN_TABS);
