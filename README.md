@@ -8,16 +8,32 @@
   - [x] Batch SQLite writes
   - [x] Fix advertisement causing delay
   - [x] Add RustDoc comments
-  - [ ] Create cli
+  - [x] Create cli
   - [ ] Add tests
   - [ ] Add CI
   - [ ] remove `unwrap()`s
+  - [ ] Store Timestamps instead of strings
 
-- To scrape, use `cargo run --release --bin scraper` in the root directory of the project
+- to install use the following commands
 
-  - This will output to 'sports.db' in the root directory
-  - This uses chromium with an adblocker to scrape the website
+  ```bash
+  git clone https://github.com/NikolaiSch/sportshub-scraper
+  cd sportshub-scraper
+  cargo install --path .
+  ```
 
-- To run the server, use `cargo run --release --bin web_server` in the root directory of the project
-  - This will start a server on port 8080
-  - This uses the 'sports.db' file in the root directory
+- to run use the following command
+
+  ```bash
+  sportshub-scraper
+
+  # to scrape use, where <T> is number of simultaneous tabs
+  sportshub-scraper scrape <T>
+
+  # to run the http api use
+  sportshub-scraper server
+  ```
+
+- server has the following urls:
+- `/` - returns all scraped data
+- `/active` - returns all links with active streams (with links to the streams)
