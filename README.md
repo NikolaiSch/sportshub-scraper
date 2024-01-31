@@ -25,13 +25,13 @@
 - to run use the following command
 
   ```bash
-  sportshub-scraper
+  sportshub
 
   # to scrape use, where <T> is number of simultaneous tabs
-  sportshub-scraper scrape <T>
+  sportshub scrape <T>
 
   # to run the http api use
-  sportshub-scraper server
+  sportshub server
   ```
 
 - server has the following urls:
