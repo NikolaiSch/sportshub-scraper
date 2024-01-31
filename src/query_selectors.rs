@@ -15,7 +15,7 @@ pub enum DomParseError {
     Unknown,
 }
 
-pub fn get_url_from_dom(dom: &VDom<'_>, parser: &Parser<'_>) -> Result<String, Box<dyn Error>> {
+pub fn get_url_from_dom(dom: &VDom<'_>, parser: &Parser<'_>) -> Result<String, anyhow::Error> {
     let q = dom
         .query_selector("a")
         .ok_or(DomParseError::NotFound)?
@@ -38,7 +38,7 @@ pub fn get_url_from_dom(dom: &VDom<'_>, parser: &Parser<'_>) -> Result<String, B
 pub fn get_game_name_from_dom(
     dom: &VDom<'_>,
     parser: &Parser<'_>,
-) -> Result<String, Box<dyn Error>> {
+) -> Result<String, anyhow::Error> {
     let q = dom
         .query_selector("span.mr-5")
         .ok_or(DomParseError::NotFound)?
@@ -52,7 +52,7 @@ pub fn get_game_name_from_dom(
     Ok(q)
 }
 
-pub fn get_info_from_dom(dom: &VDom<'_>, parser: &Parser<'_>) -> Result<String, Box<dyn Error>> {
+pub fn get_info_from_dom(dom: &VDom<'_>, parser: &Parser<'_>) -> Result<String, anyhow::Error> {
     let q = dom
         .query_selector("span.evdesc.event-desc")
         .ok_or(DomParseError::NotFound)?
@@ -66,7 +66,7 @@ pub fn get_info_from_dom(dom: &VDom<'_>, parser: &Parser<'_>) -> Result<String, 
     Ok(q)
 }
 
-pub fn get_country_from_dom(dom: &VDom<'_>, parser: &Parser<'_>) -> Result<String, Box<dyn Error>> {
+pub fn get_country_from_dom(dom: &VDom<'_>, parser: &Parser<'_>) -> Result<String, anyhow::Error> {
     let q = dom
         .query_selector("i.icon-competitions")
         .ok_or(DomParseError::NotFound)?

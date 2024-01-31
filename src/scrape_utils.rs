@@ -2,6 +2,7 @@
 //! and save them to database.  It also checks the stream links and saves them
 //! to database.
 
+use std::any;
 use std::borrow::BorrowMut;
 use std::error::Error;
 
@@ -9,6 +10,7 @@ use std::sync::Arc;
 use std::sync::Mutex;
 use std::thread;
 
+use anyhow::anyhow;
 use diesel::ExpressionMethods;
 use diesel::RunQueryDsl;
 use diesel::SqliteConnection;
@@ -27,7 +29,7 @@ use crate::schema;
 /// # Arguments
 /// *tab* - is the tab that we use to navigate to the page and scrape the games, we use headless_chrome tabs.  
 /// *conn* - is the connection to the database, we use diesel to save the games to database.
-pub fn today_games(tab: &Tab, conn: &mut SqliteConnection) -> Result<(), Box<dyn Error>> {
+pub fn today_games(tab: &Tab, conn: &mut SqliteConnection) -> Result<(), anyhow::Error> {
     // we navigate to the page and wait until the table showing links is loaded
     tab.navigate_to("https://reddit.sportshub.fan/")?
         .wait_for_element(".list-events")?;
@@ -59,7 +61,7 @@ pub fn today_games(tab: &Tab, conn: &mut SqliteConnection) -> Result<(), Box<dyn
 /// It takes roughly 400µs to parse a single game. (± 100µs)
 ///
 /// This should never panic
-pub fn parse_game(conn: &mut SqliteConnection, html: &str) -> Result<(), Box<dyn Error>> {
+pub fn parse_game(conn: &mut SqliteConnection, html: &str) -> Result<(), anyhow::Error> {
     let time_start = std::time::Instant::now();
 
     // creating a new parser for each game is not the best idea, but it's not a problem
@@ -125,7 +127,7 @@ pub fn url_to_links(
     tab: &Tab,
     conn: &mut SqliteConnection,
     url: &str,
-) -> Result<(), Box<dyn Error>> {
+) -> Result<(), anyhow::Error> {
     tab.navigate_to(url)?.wait_for_element("#content-event")?;
 
     // they encode url, so we need to decode it
@@ -157,8 +159,7 @@ pub fn url_to_links(
     diesel::update(schema::stream::table)
         .set(schema::stream::stream_link.eq(joined_links))
         .filter(schema::stream::url.eq(u))
-        .execute(conn)
-        .unwrap();
+        .execute(conn)?;
 
     Ok(())
 }
@@ -171,7 +172,7 @@ pub fn check_all_links(
     browser: &Browser,
     conn: &mut SqliteConnection,
     tabs_count: usize,
-) -> Result<(), Box<dyn Error>> {
+) -> Result<(), anyhow::Error> {
     // we get all the streams from database that have no links
     // wrap it in an arc to share it between threads
     let all_streams = Arc::new(db::get_empty_streams(conn));
@@ -195,7 +196,12 @@ pub fn check_all_links(
         tabs.push(tab.clone());
 
         // we get the streams from the chunked streams and turn it to a vec
-        let mut streams = chunked_streams.get(tab_num).unwrap().to_vec().clone();
+        let mut streams = chunked_streams
+            .get(tab_num)
+            .ok_or(anyhow!("invalid chunked_stream index"))?
+            .to_vec()
+            .clone();
+
         let completed = completed_mutex.clone();
 
         threads.push(thread::spawn(move || {
@@ -206,7 +212,9 @@ pub fn check_all_links(
             while let Some(stream) = streams.pop() {
                 check_link(tab.clone().borrow_mut(), &mut conn, &stream.url).unwrap();
                 // we print the progress
-                let mut completed_count = completed.lock().unwrap();
+                let mut completed_count = completed
+                    .lock()
+                    .expect("mutex is already opened by current thread");
                 *completed_count += 1;
                 println!("{} / {}", completed_count, length);
             }
@@ -215,10 +223,13 @@ pub fn check_all_links(
 
     // we wait for all the threads to finish
     for t in threads {
-        t.join().unwrap();
+        if t.join().is_err() {
+            return Err(anyhow!("thread panicked"));
+        }
     }
 
     let time_end = std::time::Instant::now();
+
     println!(
         "Time elapsed to scan all games: {:?}",
         time_end - time_start
@@ -231,13 +242,13 @@ pub fn check_link(
     tab: &mut Arc<Tab>,
     conn: &mut SqliteConnection,
     link: &str,
-) -> Result<(), Box<dyn Error>> {
+) -> Result<(), anyhow::Error> {
     url_to_links(tab.borrow_mut(), conn.borrow_mut(), link).unwrap();
 
     Ok(())
 }
 
-pub fn start_scraping(open_tabs: usize) {
+pub fn start_scraping(open_tabs: usize) -> Result<(), anyhow::Error> {
     // realised we didnt need adblocker when headless
     let browser = Browser::new({
         headless_chrome::LaunchOptions {
@@ -246,18 +257,17 @@ pub fn start_scraping(open_tabs: usize) {
             ignore_certificate_errors: true,
             ..Default::default()
         }
-    })
-    .unwrap();
+    })?;
 
     let mut conn = db::establish_connection();
 
-    let tab = browser.new_tab().unwrap();
+    let tab = browser.new_tab()?;
 
     // we get to the page with all the links for upcoming games
     // this will scrape ~500 games and save them to database
     // takes roughly 1 second, but it's not a problem, because
     // we do it only once a day
-    today_games(&tab, &mut conn).unwrap();
+    today_games(&tab, &mut conn)?;
 
     // we get all the links from database that don't have stream links
     // and we check them in parallel
@@ -265,11 +275,13 @@ pub fn start_scraping(open_tabs: usize) {
     // takes ~27 seconds to scan everything
     // however can improve by using a shared queue instead of splitting it
     // so... TODO!
-    check_all_links(&browser, &mut conn, open_tabs).unwrap();
+    check_all_links(&browser, &mut conn, open_tabs)?;
 
     // we close all the tabs because otherwise it shows an error when program
     // finishes
     for t in (*browser.get_tabs().as_ref().lock().unwrap()).iter() {
-        t.close(true).unwrap();
+        t.close(true)?;
     }
+
+    Ok(())
 }
