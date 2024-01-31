@@ -57,6 +57,8 @@ pub fn today_games(tab: &Tab, conn: &mut SqliteConnection) -> Result<(), Box<dyn
 
 /// This function parses a single game and saves it to database.
 /// It takes roughly 400µs to parse a single game. (± 100µs)
+///
+/// This should never panic
 pub fn parse_game(conn: &mut SqliteConnection, html: &str) -> Result<(), Box<dyn Error>> {
     let time_start = std::time::Instant::now();
 
