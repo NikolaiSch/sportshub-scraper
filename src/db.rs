@@ -44,5 +44,5 @@ pub fn get_streams_by_id(
 ) -> Result<Vec<Stream>, anyhow::Error> {
     Ok(stream
         .filter(schema::stream::id.eq(search_id))
-        .load::<Stream>()?)
+        .load::<Stream>(conn)?)
 }

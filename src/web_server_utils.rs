@@ -3,24 +3,24 @@ use rocket::{get, routes, serde::json::Json, Rocket};
 
 #[get("/")]
 async fn get_all_streams() -> Json<Vec<Stream>> {
-    let mut conn = db::establish_connection();
-    let streams = db::get_streams(&mut conn);
+    let mut conn = db::establish_connection().unwrap();
+    let streams = db::get_streams(&mut conn).unwrap();
 
     Json(streams)
 }
 
 #[get("/active")]
 async fn get_active_streams() -> Json<Vec<Stream>> {
-    let mut conn = db::establish_connection();
-    let streams = db::get_linked_streams(&mut conn);
+    let mut conn = db::establish_connection().unwrap();
+    let streams = db::get_linked_streams(&mut conn).unwrap();
 
     Json(streams)
 }
 
 #[get("/id/<id>")]
 async fn get_stream_by_id(id: i32) -> Json<Vec<Stream>> {
-    let mut conn = db::establish_connection();
-    let streams = db::get_streams_by_id(&mut conn, id);
+    let mut conn = db::establish_connection().unwrap();
+    let streams = db::get_streams_by_id(&mut conn, id).unwrap();
 
     Json(streams)
 }
