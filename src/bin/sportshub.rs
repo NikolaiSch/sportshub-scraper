@@ -1,6 +1,6 @@
 use anyhow::Error;
 use clap::{Parser, Subcommand};
-use diesel::{sqlite::Sqlite};
+use diesel::sqlite::Sqlite;
 use diesel_migrations::{embed_migrations, EmbeddedMigrations, MigrationHarness};
 use scraper::{db, scrape_utils, web_server_utils};
 
@@ -31,7 +31,11 @@ enum Commands {
         tabs: usize,
     },
     #[clap(about = "Run the web server")]
-    Server,
+    Server {
+        /// port to run the server on
+        #[clap(short, long, default_value = "3000")]
+        port: u16,
+    },
 }
 
 #[tokio::main]
@@ -45,8 +49,8 @@ async fn main() {
         Some(Commands::Parse { tabs }) => {
             scrape_utils::start_scraping(tabs);
         }
-        Some(Commands::Server) => {
-            web_server_utils::run().await;
+        Some(Commands::Server { port }) => {
+            web_server_utils::run(port).await;
         }
         None => {
             println!("use sportshub -h for help");

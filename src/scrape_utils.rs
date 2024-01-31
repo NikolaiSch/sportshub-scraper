@@ -5,7 +5,6 @@
 use std::borrow::BorrowMut;
 use std::error::Error;
 
-use std::ffi::OsStr;
 use std::sync::Arc;
 use std::sync::Mutex;
 use std::thread;
@@ -242,7 +241,6 @@ pub fn check_all_links(
             // we iterate over all the streams and check them
             while let Some(stream) = streams.pop() {
                 check_link(tab.clone().borrow_mut(), &mut conn, &stream.url).unwrap();
-
                 // we print the progress
                 let mut completed_count = completed.lock().unwrap();
                 *completed_count += 1;
