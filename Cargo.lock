@@ -1941,6 +1941,7 @@ dependencies = [
  "libsqlite3-sys",
  "rocket",
  "serde",
+ "serde_json",
  "thiserror",
  "tl",
  "tokio",
