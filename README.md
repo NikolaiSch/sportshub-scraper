@@ -4,9 +4,9 @@
 
 ## Very much in progress
 
-## This tools performance is very much based on the performance of the website, so it might be slow at times
+### This tools performance is very much based on the performance of the website, so it might be slow at times
 
-## Especially during popular football games
+### Especially during popular football games
 
 - Todo
 
