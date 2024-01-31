@@ -5,6 +5,7 @@
 use std::borrow::BorrowMut;
 use std::error::Error;
 
+use std::ffi::OsStr;
 use std::sync::Arc;
 use std::sync::Mutex;
 use std::thread;
@@ -272,4 +273,42 @@ pub fn check_link(
     url_to_links(tab.borrow_mut(), conn.borrow_mut(), link).unwrap();
 
     Ok(())
+}
+
+pub fn start_scraping(open_tabs: usize) {
+    // we use it headful for now, because headless chrome doesn't support extensions
+    let browser = Browser::new({
+        headless_chrome::LaunchOptions {
+            headless: false,
+            sandbox: true,
+            ignore_certificate_errors: true,
+            extensions: vec![OsStr::new("./chrome-ext/adblock")],
+            ..Default::default()
+        }
+    })
+    .unwrap();
+
+    let mut conn = db::establish_connection();
+
+    let tab = browser.new_tab().unwrap();
+
+    // we get to the page with all the links for upcoming games
+    // this will scrape ~500 games and save them to database
+    // takes roughly 1 second, but it's not a problem, because
+    // we do it only once a day
+    today_games(&tab, &mut conn).unwrap();
+
+    // we get all the links from database that don't have stream links
+    // and we check them in parallel
+    // my 8gb ram m1 macbook air can handle 10 tabs relatively easily
+    // takes ~27 seconds to scan everything
+    // however can improve by using a shared queue instead of splitting it
+    // so... TODO!
+    check_all_links(&browser, &mut conn, open_tabs).unwrap();
+
+    // we close all the tabs because otherwise it shows an error when program
+    // finishes
+    for t in (*browser.get_tabs().as_ref().lock().unwrap()).iter() {
+        t.close(true).unwrap();
+    }
 }

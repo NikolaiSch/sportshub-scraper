@@ -7,8 +7,8 @@ use crate::schema::stream::dsl::*;
 use diesel::RunQueryDsl;
 
 pub fn establish_connection() -> SqliteConnection {
-    let database_url = "sports.db";
-    SqliteConnection::establish(database_url)
+    let database_url = format!("{}/sports.db", std::env::temp_dir().display());
+    SqliteConnection::establish(&database_url)
         .unwrap_or_else(|_| panic!("Error connecting to {}", database_url))
 }
 
