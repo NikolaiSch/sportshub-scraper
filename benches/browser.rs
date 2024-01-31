@@ -1,6 +1,6 @@
 use std::ffi::OsStr;
 
-use criterion::{black_box, criterion_group, criterion_main, Criterion};
+use criterion::{criterion_group, criterion_main, Criterion};
 use headless_chrome::Browser;
 
 fn create_connection() {
@@ -99,22 +99,22 @@ fn criterion_benchmark(c: &mut Criterion) {
 
     // 1.54 seconds
     group.bench_function("Create new browser basic", |b| {
-        b.iter(|| create_connection())
+        b.iter(create_connection)
     });
 
     // 0.943 seconds
     group.bench_function("Create new browser headless", |b| {
-        b.iter(|| create_connection_headless())
+        b.iter(create_connection_headless)
     });
 
     // 1.48 seconds
     group.bench_function("Create new browser sandbox", |b| {
-        b.iter(|| create_connection_with_sandbox())
+        b.iter(create_connection_with_sandbox)
     });
 
     // 1.69 seconds
     group.bench_function("Create new browser adblock ext", |b| {
-        b.iter(|| create_connection_with_extensions())
+        b.iter(create_connection_with_extensions)
     });
 
     group.finish();

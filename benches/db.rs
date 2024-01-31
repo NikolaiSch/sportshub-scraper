@@ -1,4 +1,4 @@
-use criterion::{black_box, criterion_group, criterion_main, Criterion};
+use criterion::{criterion_group, criterion_main, Criterion};
 use scraper::db;
 
 fn create_connection() {
@@ -8,7 +8,7 @@ fn create_connection() {
 fn criterion_benchmark(c: &mut Criterion) {
     // 43.6 nano seconds
     c.bench_function("Create new db connection", |b| {
-        b.iter(|| create_connection())
+        b.iter(create_connection)
     });
 
     // 228.3 nano seconds

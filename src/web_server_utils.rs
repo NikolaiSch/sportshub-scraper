@@ -1,5 +1,5 @@
 use crate::{db, models::Stream};
-use rocket::{get, launch, routes, serde::json::Json, Rocket};
+use rocket::{get, routes, serde::json::Json, Rocket};
 
 #[get("/")]
 async fn get_all_streams() -> Json<Vec<Stream>> {
