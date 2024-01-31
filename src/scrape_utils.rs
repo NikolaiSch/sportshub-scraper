@@ -17,10 +17,12 @@ use headless_chrome::Tab;
 
 use crate::db;
 use crate::models;
+use crate::query_selectors;
 use crate::schema;
 
 /// This function scrapes all the games from the home page and saves them to database.
 /// It takes roughly 1 second to scrape ~500 games.
+/// This function should not panic
 ///
 /// # Arguments
 /// *tab* - is the tab that we use to navigate to the page and scrape the games, we use headless_chrome tabs.  
@@ -37,7 +39,7 @@ pub fn today_games(tab: &Tab, conn: &mut SqliteConnection) -> Result<(), Box<dyn
         .replace(['\t', '\n'], "");
 
     // create the parser using tl
-    let dom = tl::parse(&html, tl::ParserOptions::default()).unwrap();
+    let dom = tl::parse(&html, tl::ParserOptions::default())?;
     let parser = dom.parser();
 
     // we get all the games by checking the wrapper class
@@ -45,7 +47,9 @@ pub fn today_games(tab: &Tab, conn: &mut SqliteConnection) -> Result<(), Box<dyn
 
     // we iterate over all the games and parse them
     for game in dom_games {
-        parse_game(conn, game.get(parser).unwrap().inner_html(parser).as_ref())?;
+        if let Some(x) = game.get(parser) {
+            parse_game(conn, &x.inner_html(parser).to_string())?;
+        }
     }
 
     Ok(())
@@ -58,27 +62,12 @@ pub fn parse_game(conn: &mut SqliteConnection, html: &str) -> Result<(), Box<dyn
 
     // creating a new parser for each game is not the best idea, but it's not a problem
     // because it takes roughly 400µs to parse a single game
-    let dom = tl::parse(html, tl::ParserOptions::default()).unwrap();
+    let dom = tl::parse(html, tl::ParserOptions::default())?;
     let parser = dom.parser();
 
     // we get the url of the game
     // since there are no other links in the div
-    let url = dom
-        .query_selector("a")
-        .unwrap()
-        .next()
-        .unwrap()
-        .get(parser)
-        .unwrap()
-        .as_tag()
-        .unwrap()
-        .attributes()
-        .get("href")
-        .unwrap()
-        .unwrap()
-        .as_utf8_str()
-        .to_string();
-
+    let url = query_selectors::get_url_from_dom(&dom, parser)?;
     // we get the name of the game
     // format is: <span class="mr-5">HomeTeam - AwayTeam</span>
     let name = dom
