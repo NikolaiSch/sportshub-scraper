@@ -15,6 +15,29 @@ pub enum DomParseError {
     Unknown,
 }
 
+/// Get the event url from the dom of the eventlist
+/// # Arguments
+/// * `dom` - The dom of the eventlist (tl)
+/// * `parser` - The parser of the eventlist (tl)
+///
+/// # Example
+/// ```
+/// use scraper::query_selectors::get_url_from_dom;
+///
+/// let html = r#"
+/// <html>
+///    <body>
+///       <a href="https://sportshub.fan/event/ypiranga_rs_novo_hamburgo_191503337/">
+///     </body>
+/// </html>
+/// "#;
+///
+/// let dom = tl::parse(html, tl::ParserOptions::default()).unwrap();
+/// let parser = dom.parser();
+///
+/// let link = get_url_from_dom(&dom, &parser).unwrap();
+/// assert_eq!(link, "https://sportshub.fan/event/ypiranga_rs_novo_hamburgo_191503337/");
+/// ```
 pub fn get_url_from_dom(dom: &VDom<'_>, parser: &Parser<'_>) -> Result<String, anyhow::Error> {
     let q = dom
         .query_selector("a")
@@ -35,6 +58,28 @@ pub fn get_url_from_dom(dom: &VDom<'_>, parser: &Parser<'_>) -> Result<String, a
     Ok(q)
 }
 
+/// Get the game name from the dom of the eventlist
+/// # Arguments
+/// * `dom` - The dom of the eventlist (tl)
+/// * `parser` - The parser of the eventlist (tl)
+/// # Example
+/// ```
+/// use scraper::query_selectors::get_game_name_from_dom;
+/// let html = r#"
+/// <html>
+///   <body>
+///    <div class="event-name">
+///    <span class="mr-5">Ypiranga RS - Novo Hamburgo</span>
+///   </div>
+///  </body>
+/// </html>
+/// "#;
+///
+/// let dom = tl::parse(html, tl::ParserOptions::default()).unwrap();
+/// let parser = dom.parser();
+///
+/// let event_name = get_game_name_from_dom(&dom, &parser).unwrap();
+/// assert_eq!(event_name, "Ypiranga RS - Novo Hamburgo");
 pub fn get_game_name_from_dom(
     dom: &VDom<'_>,
     parser: &Parser<'_>,
@@ -52,6 +97,28 @@ pub fn get_game_name_from_dom(
     Ok(q)
 }
 
+/// Get the event info from the dom of the eventlist
+/// # Arguments
+/// * `dom` - The dom of the eventlist (tl)
+/// * `parser` - The parser of the eventlist (tl)
+/// # Example
+/// ```
+/// use scraper::query_selectors::get_info_from_dom;
+/// let html = r#"
+/// <html>
+///  <body>
+///  <div class="event-info">
+///  <span class="evdesc event-desc">Brazilian Campeonato Gaucho</span>
+/// </div>
+/// </body>
+/// </html>
+/// "#;
+///
+/// let dom = tl::parse(html, tl::ParserOptions::default()).unwrap();
+/// let parser = dom.parser();
+///
+/// let event_info = get_info_from_dom(&dom, &parser).unwrap();
+/// assert_eq!(event_info, "Brazilian Campeonato Gaucho");
 pub fn get_info_from_dom(dom: &VDom<'_>, parser: &Parser<'_>) -> Result<String, anyhow::Error> {
     let q = dom
         .query_selector("span.evdesc.event-desc")
@@ -66,6 +133,26 @@ pub fn get_info_from_dom(dom: &VDom<'_>, parser: &Parser<'_>) -> Result<String, 
     Ok(q)
 }
 
+/// Get the event country from the dom of the eventlist
+/// # Arguments
+/// * `dom` - The dom of the eventlist (tl)
+/// * `parser` - The parser of the eventlist (tl)
+/// # Example
+/// ```
+/// use scraper::query_selectors::get_country_from_dom;
+/// let html = r#"
+/// <html>
+///   <body>
+///       <i class="icon-competitions" style="background-image: url(https://sportshub.cdn.prismic.io/sportshub/brazil.svg);"></i>
+///   </body>
+/// </html>
+/// "#;
+///
+/// let dom = tl::parse(html, tl::ParserOptions::default()).unwrap();
+/// let parser = dom.parser();
+///
+/// let country = get_country_from_dom(&dom, &parser).unwrap();
+/// assert_eq!(country, "brazil");
 pub fn get_country_from_dom(dom: &VDom<'_>, parser: &Parser<'_>) -> Result<String, anyhow::Error> {
     let q = dom
         .query_selector("i.icon-competitions")
