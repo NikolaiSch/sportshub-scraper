@@ -38,6 +38,11 @@
   sportshub server -p <PORT>
   ```
 
+- You can use crontab to refresh every 15 minutes,
+  ```cron
+  */15 * * * * sportshub parser 20
+  ```
+
 - server has the following urls:
 - `/` - returns all scraped data
 - `/active` - returns all links with active streams (with links to the streams)
