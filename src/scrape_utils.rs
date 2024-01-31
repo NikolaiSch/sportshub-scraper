@@ -166,17 +166,20 @@ pub fn url_to_links(
     conn: &mut SqliteConnection,
     url: &str,
 ) -> Result<(), Box<dyn Error>> {
-    tab.navigate_to(url).unwrap();
+    tab.navigate_to(url)?.wait_for_element("#content-event")?;
 
     // they encode url, so we need to decode it
     let u = urlencoding::decode(url).unwrap();
 
     // we wait until the table showing links is loaded
     // then we get all link elements in the table
-    let elements = tab.find_elements("#links_block table a");
+    // xpath seems slower but they changed the classname overnight
+    // so xpath is more reliable
+    let elements = tab.find_elements_by_xpath("//*[@class=\"lnktbj\"]/tbody/tr/td[6]/a");
 
     // if there are no links, we return
     if elements.is_err() {
+        // println!("No links for {}", u);
         return Ok(());
     };
 
@@ -186,12 +189,13 @@ pub fn url_to_links(
         .unwrap()
         .into_iter()
         .map(|e| e.get_attributes().unwrap().unwrap().get(1).unwrap().clone())
-        .filter(|e| e.contains("//"))
         .collect();
+
+    let joined_links = stream_links.join(",");
 
     // we save the links to database
     diesel::update(schema::stream::table)
-        .set(schema::stream::stream_link.eq(stream_links.join(",")))
+        .set(schema::stream::stream_link.eq(joined_links))
         .filter(schema::stream::url.eq(u))
         .execute(conn)
         .unwrap();
