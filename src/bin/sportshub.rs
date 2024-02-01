@@ -2,7 +2,7 @@ use anyhow::Error;
 use clap::{Parser, Subcommand};
 use diesel::sqlite::Sqlite;
 use diesel_migrations::{embed_migrations, EmbeddedMigrations, MigrationHarness};
-use scraper::{db, scrape, web_server_utils};
+use scraper::{db, scrape, web_server_routes};
 
 
 #[derive(Parser)]
@@ -123,7 +123,7 @@ async fn main() {
             if full_refresh {
                 scrape::start_scraping(10, true).unwrap();
             }
-            web_server_utils::run(port, silent).await.unwrap();
+            web_server_routes::run(port, silent).await.unwrap();
         }
         None => {
             println!("use sportshub -h for help");
