@@ -185,7 +185,7 @@ pub fn url_to_links(tab: &Tab, conn: &mut SqliteConnection, url: &str) -> Result
     tab.navigate_to(url)?.wait_for_element("#content-event")?;
 
     // they encode url, so we need to decode it
-    let u = urlencoding::decode(url).unwrap();
+    let u = urlencoding::decode(url)?;
 
     // we wait until the table showing links is loaded
     // then we get all link elements in the table
@@ -201,8 +201,7 @@ pub fn url_to_links(tab: &Tab, conn: &mut SqliteConnection, url: &str) -> Result
 
     // we get the links from the elements
     // checking if they have "//" in them because some of them are just text
-    let stream_links: Vec<String> = elements
-        .unwrap()
+    let stream_links: Vec<String> = elements?
         .into_iter()
         .map(|e| e.get_attributes().unwrap().unwrap().get(1).unwrap().clone())
         .collect();
@@ -219,7 +218,7 @@ pub fn url_to_links(tab: &Tab, conn: &mut SqliteConnection, url: &str) -> Result
 }
 
 /// This function checks all the links in database and saves them to database.
-/// It takes roughly 27 seconds to check all the links.
+/// It takes roughly 27 seconds (~18/s) to check all the links.
 /// (My 8gb ram m1 macbook air with a 90mbps internet connection can handle 10 tabs relatively easily)
 /// It can be improved by using a shared queue instead of splitting it.
 pub fn check_all_links(browser: &Browser, conn: &mut SqliteConnection, tabs_count: usize) -> Result<(), anyhow::Error> {
