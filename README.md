@@ -58,7 +58,21 @@
   */15 * * * * sportshub data update -H
   ```
 
-- server has the following urls:
-- `/` - returns all scraped data
-- `/active` - returns all links with active streams (with links to the streams)
-- `/id/<id>` - returns the data for the given id
+- server has the following routes:
+
+  - informational
+
+    - `/` - returns a list of all available routes
+    - `/version` - returns the version of the server
+    - `/info/leagues` - returns a list of all leagues
+    - `/info/sports` - returns a list of all sports
+
+  - data
+    - `/all` - returns all events
+    - `/active` - returns all active events
+    - `/sport/<sport>` - returns all events of a specific sport
+    - `/league/<league>` - returns all events of a specific league
+    - `/id/<id>` - returns a specific event
+    - `/team/home/<team>` - returns all events where the home team is `<team>`
+    - `/team/away/<team>` - returns all events where the away team is `<team>`
+    - `/team/<team>` - returns all events where `<team>` is either home or away

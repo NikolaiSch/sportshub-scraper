@@ -2,16 +2,25 @@
 //! It uses the rocket framework.
 
 use db::models::Stream;
-use rocket::{get, routes, serde::json::Json, Rocket};
+use rocket::{get, response::content::RawHtml, routes, serde::json::Json, Rocket};
 
 use crate::{
     constants::{self, sports::Sport},
     db::{self, helpers::LeagueWithCountry},
 };
 
+pub const INDEX_HTML: &str = include_str!("html/index.html");
+
 #[get("/")]
-async fn get_route_desc() -> &'static str {
-    "Hello, world!"
+async fn get_route_desc() -> RawHtml<String> {
+    let out = INDEX_HTML.replace("{{version}}", env!("CARGO_PKG_VERSION")).to_owned();
+
+    RawHtml(out)
+}
+
+#[get("/version")]
+async fn get_version() -> &'static str {
+    env!("CARGO_PKG_VERSION")
 }
 
 #[get("/all")]
@@ -70,6 +79,14 @@ async fn get_streams_by_either_team(team: &str) -> Json<Vec<Stream>> {
     Json(streams)
 }
 
+#[get("/leagues/<league>")]
+async fn get_streams_by_league(league: &str) -> Json<Vec<Stream>> {
+    let mut conn = db::helpers::establish_connection().unwrap();
+    let streams = db::helpers::get_streams_by_league(&mut conn, league.to_owned()).unwrap();
+
+    Json(streams)
+}
+
 #[get("/leagues")]
 async fn info_get_leagues() -> Json<Vec<LeagueWithCountry>> {
     let mut conn = db::helpers::establish_connection().unwrap();
@@ -85,6 +102,7 @@ async fn info_get_sports() -> Json<Vec<Sport>> {
     Json(sports)
 }
 
+
 pub async fn run(port: u16, silent: bool) -> anyhow::Result<()> {
     Rocket::custom(rocket::Config {
         port,
@@ -99,10 +117,12 @@ pub async fn run(port: u16, silent: bool) -> anyhow::Result<()> {
         "/",
         routes![
             get_route_desc,
+            get_version,
             get_all_streams,
             get_active_streams,
             get_stream_by_id,
             get_streams_by_sport,
+            get_streams_by_league,
             get_streams_by_home_team,
             get_streams_by_away_team,
             get_streams_by_either_team,

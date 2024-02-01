@@ -1,0 +1,108 @@
+<html>
+
+<body>
+    <h1>sportshub-{{version}} has the following routes:</h1>
+
+    <h2>Informational</h2>
+    <table>
+        <tr>
+            <th>Link</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td><a href="/">/</a></td>
+            <td>returns a list of all available routes</td>
+        </tr>
+        <tr>
+            <td><a href="/version">/version</a></td>
+            <td>returns the version of the server</td>
+        </tr>
+        <tr>
+            <td><a href="/info/leagues">/info/leagues</a></td>
+            <td>returns a list of all leagues</td>
+        </tr>
+        <tr>
+            <td><a href="/info/sports">/info/sports</a></td>
+            <td>returns a list of all sports</td>
+        </tr>
+
+    </table>
+
+    <h2>API</h2>
+    <table>
+        <tr>
+            <th>Link</th>
+            <th>Input</th>
+            <th>Output</th>
+        </tr>
+        <tr>
+            <td><a href="/all">/all</a></td>
+            <td>none</td>
+            <td>all events</td>
+        </tr>
+        <tr>
+            <td><a href="/active">/active</a></td>
+            <td>none</td>
+            <td>all active events</td>
+        </tr>
+        <tr>
+            <td><a href="/sport/<sport>">/sport/&lt;sport&gt;</a></td>
+            <td>sport</td>
+            <td>all events of a specific sport</td>
+        </tr>
+        <tr>
+            <td><a href="/league/<league>">/league/&lt;league&gt;</a></td>
+            <td>league</td>
+            <td>all events of a specific league</td>
+        </tr>
+        <tr>
+            <td><a href="/id/<id>">/id/&lt;id&gt;</a></td>
+            <td>id</td>
+            <td>a specific event</td>
+        </tr>
+        <tr>
+            <td><a href="/team/home/<team>">/team/home/&lt;team&gt;</a></td>
+            <td>team</td>
+            <td>all events where the home team is <team>
+            </td>
+        </tr>
+        <tr>
+            <td><a href="/team/away/<team>">/team/away/&lt;team&gt;</a></td>
+            <td>team</td>
+            <td>all events where the away team is <team>
+            </td>
+        </tr>
+        <tr>
+            <td><a href="/team/<team>">/team/&lt;team&gt;</a></td>
+            <td>team</td>
+            <td>all events where <team> is either home or away</td>
+        </tr>
+    </table>
+
+
+</body>
+
+<style>
+    :root {
+        font-family: 'Arial Narrow Bold', sans-serif;
+    }
+
+    table {
+        font-family: arial, sans-serif;
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    td,
+    th {
+        border: 1px solid #dddddd;
+        text-align: left;
+        padding: 8px;
+    }
+
+    tr:nth-child(even) {
+        background-color: #dddddd;
+    }
+</style>
+
+</html>

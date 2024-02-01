@@ -121,3 +121,9 @@ pub fn get_active_games(conn: &mut SqliteConnection) -> Result<Vec<Stream>, anyh
 pub fn delete_all_streams(conn: &mut SqliteConnection) -> Result<usize, anyhow::Error> {
     Ok(diesel::delete(stream).execute(conn)?)
 }
+
+pub fn get_streams_by_league(conn: &mut SqliteConnection, search_league: String) -> Result<Vec<Stream>, anyhow::Error> {
+    Ok(stream
+        .filter(schema::stream::league.eq(search_league))
+        .load::<Stream>(conn)?)
+}
