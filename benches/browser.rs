@@ -98,9 +98,7 @@ fn criterion_benchmark(c: &mut Criterion) {
         .measurement_time(std::time::Duration::from_secs(20));
 
     // 1.54 seconds
-    group.bench_function("Create new browser basic", |b| {
-        b.iter(create_connection)
-    });
+    group.bench_function("Create new browser basic", |b| b.iter(create_connection));
 
     // 0.943 seconds
     group.bench_function("Create new browser headless", |b| {

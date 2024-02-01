@@ -1,9 +1,7 @@
 //! This module contains the models for the diesel ORM
 
 use diesel::prelude::*;
-use serde::ser::SerializeStruct;
-use serde::Deserialize;
-use serde::Serialize;
+use serde::{ser::SerializeStruct, Deserialize, Serialize};
 
 #[derive(Debug, Queryable, Deserialize, Clone)]
 pub struct Stream {
@@ -65,10 +63,8 @@ mod tests {
         };
 
         let serialised = serde_json::to_string(&stream).unwrap();
-        assert_eq!(
-            serialised,
-            "{\"id\":1,\"home\":\"home\",\"away\":\"away\",\"start_time\":\"start_time\",\"league\":\"league\",\"country\":\"country\",\"url\":\"url\",\"stream_link\":[\"stream_link\"]}"
-        );
+        assert_eq!(serialised,
+                   "{\"id\":1,\"home\":\"home\",\"away\":\"away\",\"start_time\":\"start_time\",\"league\":\"league\",\"country\":\"country\",\"url\":\"url\",\"stream_link\":[\"stream_link\"]}");
     }
 
     #[test]
@@ -85,10 +81,8 @@ mod tests {
         };
 
         let serialised = serde_json::to_string(&stream).unwrap();
-        assert_eq!(
-            serialised,
-            "{\"id\":1,\"home\":\"home\",\"away\":\"away\",\"start_time\":\"start_time\",\"league\":\"league\",\"country\":\"country\",\"url\":\"url\",\"stream_link\":[\"stream_link\",\"stream_link2\"]}"
-        );
+        assert_eq!(serialised,
+                   "{\"id\":1,\"home\":\"home\",\"away\":\"away\",\"start_time\":\"start_time\",\"league\":\"league\",\"country\":\"country\",\"url\":\"url\",\"stream_link\":[\"stream_link\",\"stream_link2\"]}");
     }
 
     #[test]
@@ -105,9 +99,7 @@ mod tests {
         };
 
         let serialised = serde_json::to_string(&stream).unwrap();
-        assert_eq!(
-            serialised,
-            "{\"id\":1,\"home\":\"home\",\"away\":\"away\",\"start_time\":\"start_time\",\"league\":\"league\",\"country\":\"country\",\"url\":\"url\",\"stream_link\":[\"\"]}"
-        );
+        assert_eq!(serialised,
+                   "{\"id\":1,\"home\":\"home\",\"away\":\"away\",\"start_time\":\"start_time\",\"league\":\"league\",\"country\":\"country\",\"url\":\"url\",\"stream_link\":[\"\"]}");
     }
 }
