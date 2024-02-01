@@ -2,9 +2,12 @@
 //! and save them to database.  It also checks the stream links and saves them
 //! to database.
 
+
 use std::{
     borrow::BorrowMut,
-    sync::{Arc, Mutex},
+    collections::{vec_deque, VecDeque},
+    iter,
+    sync::{Arc, Mutex, RwLock, RwLockWriteGuard},
     thread,
 };
 
@@ -12,6 +15,7 @@ use anyhow::anyhow;
 use db::{models, schema};
 use diesel::{ExpressionMethods, RunQueryDsl, SqliteConnection};
 use headless_chrome::{Browser, Tab};
+use indicatif::{MultiProgress, ProgressBar, ProgressIterator, ProgressStyle};
 
 use crate::{
     constants::sports::{self, Sport},
@@ -226,6 +230,11 @@ pub fn check_all_links(browser: &Browser, conn: &mut SqliteConnection, tabs_coun
     // wrap it in an arc to share it between threads
     let all_streams = Arc::new(db::helpers::get_empty_streams(conn)?);
 
+    let m = MultiProgress::new();
+    let sty = ProgressStyle::with_template("[{elapsed_precise}] {bar:40.cyan/blue} {pos:>7}/{len:7} {msg}")
+        .unwrap()
+        .progress_chars("##-");
+
     // we split the streams into chunks and create a thread for each chunk
     let chunked_streams: Vec<&[models::Stream]> = all_streams.chunks(all_streams.len() / tabs_count).collect();
 
@@ -236,6 +245,7 @@ pub fn check_all_links(browser: &Browser, conn: &mut SqliteConnection, tabs_coun
     let completed_mutex = Arc::new(Mutex::new(0));
 
     let time_start = std::time::Instant::now();
+
 
     // for each tab count we create a new tab and a new thread
     for tab_num in 0..tabs_count {
@@ -250,7 +260,10 @@ pub fn check_all_links(browser: &Browser, conn: &mut SqliteConnection, tabs_coun
             .to_vec()
             .clone();
 
-        let completed = completed_mutex.clone();
+
+        let p = m.add(ProgressBar::new(streams.len() as u64));
+        p.set_style(sty.clone());
+
 
         threads.push(thread::spawn(move || {
             // sqlite should be able to handle 10 connections at once
@@ -259,10 +272,8 @@ pub fn check_all_links(browser: &Browser, conn: &mut SqliteConnection, tabs_coun
             // we iterate over all the streams and check them
             while let Some(stream) = streams.pop() {
                 check_link(tab.clone().borrow_mut(), &mut conn, &stream.url).unwrap();
-                // we print the progress
-                let mut completed_count = completed.lock().expect("mutex is already opened by current thread");
-                *completed_count += 1;
-                println!("{} / {}", completed_count, length);
+
+                p.inc(1);
             }
         }));
     }
