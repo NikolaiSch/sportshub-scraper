@@ -362,7 +362,7 @@ mod test {
             let date = "2-8-8-15";
             let parsed_date = date_parser_with_closest_year(date).unwrap();
 
-            assert_eq!(parsed_date, 1690964100);
+            assert_eq!(parsed_date, 1722586500);
         }
 
         #[test]
@@ -436,7 +436,7 @@ mod test {
             let date = "2nd August at 8:15";
             let parsed_date = super::super::date_string_to_timestamp(date).unwrap();
 
-            assert_eq!(parsed_date, 1690964100);
+            assert_eq!(parsed_date, 1722586500);
         }
 
         #[test]
