@@ -33,3 +33,8 @@ harness = false
 [[bench]]
 name = "browser"
 harness = false
+
+[profile.release]
+strip = true
+opt-level = "z"
+lto = true
