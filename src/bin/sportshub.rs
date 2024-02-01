@@ -4,16 +4,6 @@ use diesel::sqlite::Sqlite;
 use diesel_migrations::{embed_migrations, EmbeddedMigrations, MigrationHarness};
 use scraper::{db, scrape_utils, web_server_utils};
 
-pub const MIGRATIONS: EmbeddedMigrations = embed_migrations!("migrations");
-
-fn run_migrations(connection: &mut impl MigrationHarness<Sqlite>) -> Result<(), Error> {
-    connection.run_pending_migrations(MIGRATIONS).unwrap();
-
-    let mut conn = db::helpers::establish_connection()?;
-    db::helpers::delete_all_past_streams(&mut conn)?;
-
-    Ok(())
-}
 
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
@@ -86,7 +76,7 @@ enum DataCommands {
 #[rocket::main]
 async fn main() {
     let mut conn = db::helpers::establish_connection().unwrap();
-    run_migrations(&mut conn).unwrap();
+
 
     let cli = Cli::parse();
 

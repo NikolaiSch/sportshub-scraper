@@ -2,19 +2,37 @@
 
 use std::time::{Duration, Instant};
 
-use diesel::{dsl::*, prelude::*, RunQueryDsl};
+use diesel::{dsl::*, prelude::*, sqlite::Sqlite, RunQueryDsl};
+use diesel_migrations::{embed_migrations, MigrationHarness};
 use serde::{Deserialize, Serialize};
 
 use super::{
     models::{Stream, StreamNew},
     schema,
-    schema::{stream, stream::dsl::*},
 };
+
+pub const MIGRATIONS: EmbeddedMigrations = diesel_migrations::embed_migrations!("migrations");
+
+pub fn run_migrations(connection: &mut impl MigrationHarness<Sqlite>) -> Result<(), Error> {
+    connection.run_pending_migrations(MIGRATIONS).unwrap();
+
+    let mut conn = db::helpers::establish_connection()?;
+    db::helpers::delete_all_past_streams(&mut conn)?;
+
+    Ok(())
+}
 
 pub fn establish_connection() -> Result<SqliteConnection, anyhow::Error> {
     let database_url = format!("{}/sports.db", std::env::temp_dir().display());
 
     Ok(SqliteConnection::establish(&database_url)?)
+}
+
+pub fn establish_test_connection() -> Result<SqliteConnection, anyhow::Error> {
+    let mut conn = SqliteConnection::establish("sports.db")?;
+    run_migrations(&mut conn)?;
+
+    Ok(conn)
 }
 
 pub fn create_stream(conn: &mut SqliteConnection, new_stream: &StreamNew) -> Result<usize, anyhow::Error> {
