@@ -29,7 +29,8 @@ pub struct StreamNew<'a> {
 
 impl Serialize for Stream {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-        where S: serde::ser::Serializer
+    where
+        S: serde::ser::Serializer,
     {
         let split_streams: Vec<&str> = self.stream_link.split(',').collect();
         let mut stream = serializer.serialize_struct("Stream", 8)?;
@@ -50,55 +51,55 @@ mod tests {
 
     #[test]
     fn test_serialise_streamlink() {
-        let stream = Stream { id: Some(1),
-                              home: "home".to_string(),
-                              away: "away".to_string(),
-                              start_time: "start_time".to_string(),
-                              league: "league".to_string(),
-                              country: "country".to_string(),
-                              url: "url".to_string(),
-                              stream_link: "stream_link".to_string() };
+        let stream = Stream {
+            id: Some(1),
+            home: "home".to_string(),
+            away: "away".to_string(),
+            start_time: "start_time".to_string(),
+            league: "league".to_string(),
+            country: "country".to_string(),
+            url: "url".to_string(),
+            stream_link: "stream_link".to_string(),
+        };
 
         let serialised = serde_json::to_string(&stream).unwrap();
         assert_eq!(serialised,
-                   "{\"id\":1,\"home\":\"home\",\"away\":\"away\",\"start_time\":\"start_time\",\\
-                    "league\":\"league\",\"country\":\"country\",\"url\":\"url\",\"stream_link\":\
-                    [\"stream_link\"]}");
+                   "{\"id\":1,\"home\":\"home\",\"away\":\"away\",\"start_time\":\"start_time\",\"league\":\"league\",\"country\":\"country\",\"url\":\"url\",\"stream_link\":[\"stream_link\"]}");
     }
 
     #[test]
     fn test_serialise_streamlink_multiple() {
-        let stream = Stream { id: Some(1),
-                              home: "home".to_string(),
-                              away: "away".to_string(),
-                              start_time: "start_time".to_string(),
-                              league: "league".to_string(),
-                              country: "country".to_string(),
-                              url: "url".to_string(),
-                              stream_link: "stream_link,stream_link2".to_string() };
+        let stream = Stream {
+            id: Some(1),
+            home: "home".to_string(),
+            away: "away".to_string(),
+            start_time: "start_time".to_string(),
+            league: "league".to_string(),
+            country: "country".to_string(),
+            url: "url".to_string(),
+            stream_link: "stream_link,stream_link2".to_string(),
+        };
 
         let serialised = serde_json::to_string(&stream).unwrap();
         assert_eq!(serialised,
-                   "{\"id\":1,\"home\":\"home\",\"away\":\"away\",\"start_time\":\"start_time\",\\
-                    "league\":\"league\",\"country\":\"country\",\"url\":\"url\",\"stream_link\":\
-                    [\"stream_link\",\"stream_link2\"]}");
+                   "{\"id\":1,\"home\":\"home\",\"away\":\"away\",\"start_time\":\"start_time\",\"league\":\"league\",\"country\":\"country\",\"url\":\"url\",\"stream_link\":[\"stream_link\",\"stream_link2\"]}");
     }
 
     #[test]
     fn test_serialise_streamlink_empty() {
-        let stream = Stream { id: Some(1),
-                              home: "home".to_string(),
-                              away: "away".to_string(),
-                              start_time: "start_time".to_string(),
-                              league: "league".to_string(),
-                              country: "country".to_string(),
-                              url: "url".to_string(),
-                              stream_link: "".to_string() };
+        let stream = Stream {
+            id: Some(1),
+            home: "home".to_string(),
+            away: "away".to_string(),
+            start_time: "start_time".to_string(),
+            league: "league".to_string(),
+            country: "country".to_string(),
+            url: "url".to_string(),
+            stream_link: "".to_string(),
+        };
 
         let serialised = serde_json::to_string(&stream).unwrap();
         assert_eq!(serialised,
-                   "{\"id\":1,\"home\":\"home\",\"away\":\"away\",\"start_time\":\"start_time\",\\
-                    "league\":\"league\",\"country\":\"country\",\"url\":\"url\",\"stream_link\":\
-                    [\"\"]}");
+                   "{\"id\":1,\"home\":\"home\",\"away\":\"away\",\"start_time\":\"start_time\",\"league\":\"league\",\"country\":\"country\",\"url\":\"url\",\"stream_link\":[\"\"]}");
     }
 }
