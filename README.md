@@ -19,7 +19,7 @@
   - [x] Store Timestamps instead of strings
   - [x] Other sports
 
-- to install use the following commands
+- to install from source use the following commands
 
   ```bash
   git clone https://github.com/NikolaiSch/sportshub-scraper
