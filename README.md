@@ -55,7 +55,7 @@
 - You can use crontab to refresh every 15 minutes,
 
   ```cron
-  */15 * * * * sportshub parser 20
+  */15 * * * * sportshub data update 20
   ```
 
 - server has the following urls:
