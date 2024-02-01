@@ -47,7 +47,7 @@ impl Serialize for Stream {
 }
 
 mod tests {
-    use super::*;
+    
 
     #[test]
     fn test_serialise_streamlink() {
