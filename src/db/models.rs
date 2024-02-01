@@ -11,8 +11,8 @@ use serde::{ser::SerializeStruct, Deserialize, Serialize};
 #[derive(Debug, Queryable, Clone)]
 pub struct Stream {
     pub id: Option<i32>,
-    pub away: String,
     pub home: String,
+    pub away: String,
     pub start_time: chrono::NaiveDateTime,
     pub league: String,
     pub country: String,
