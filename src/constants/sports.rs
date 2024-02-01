@@ -1,8 +1,10 @@
+use serde::{Deserialize, Serialize};
+
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub struct Sport {
     pub name: &'static str,
     pub url: &'static str,
 }
-
 impl Sport {
     pub const fn new(name: &'static str, url: &'static str) -> Sport {
         Sport { name, url }

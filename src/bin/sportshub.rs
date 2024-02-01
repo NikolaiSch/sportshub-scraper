@@ -1,5 +1,3 @@
-use std::ops::Sub;
-
 use anyhow::Error;
 use clap::{Parser, Subcommand};
 use diesel::sqlite::Sqlite;
@@ -33,17 +31,24 @@ enum Commands {
     },
     #[clap(about = "Run the web server")]
     Serve {
-        /// port to run the server on
-        /// (default: 3000)
+        /// port to run the server on  
+        /// (default: 3000)  
         /// usage: sportshub serve -p 5173
         #[clap(short, long, default_value = "3000")]
         port: u16,
 
-        /// Whether to run the server in silent mode
-        /// (default: false)
+        /// Whether to run the server in silent mode  
+        /// (default: false)  
         /// usage: sportshub serve -s
         #[clap(short, long)]
         silent: bool,
+
+        /// Do a full data refresh before hosting server?  
+        /// (default: false)
+        /// usage: sportshub serve -F
+        /// usage: sportshub serve -F -s
+        #[clap(short = 'F', long = "full-refresh")]
+        full_refresh: bool,
     },
 }
 
@@ -67,9 +72,9 @@ enum DataCommands {
 
         /// Whether to run the browser in headless mode
         /// (default: true)
-        /// usage: sportshub update -H false
-        /// usage: sportshub update -H false -t 20
-        #[clap(short = 'H', long = "headless", default_value = "true")]
+        /// usage: sportshub update -H
+        /// usage: sportshub update -H -t 20
+        #[clap(short = 'H', long = "headless")]
         headless: bool,
     },
     #[clap(about = "Get the info about the current database")]
@@ -120,7 +125,14 @@ async fn main() {
                 }
             }
         }
-        Some(Commands::Serve { port, silent }) => {
+        Some(Commands::Serve {
+            port,
+            silent,
+            full_refresh,
+        }) => {
+            if full_refresh {
+                scrape_utils::start_scraping(10, true).unwrap();
+            }
             web_server_utils::run(port, silent).await.unwrap();
         }
         None => {

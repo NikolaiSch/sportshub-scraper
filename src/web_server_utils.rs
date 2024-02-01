@@ -4,9 +4,17 @@
 use db::models::Stream;
 use rocket::{get, routes, serde::json::Json, Rocket};
 
-use crate::db::{self, helpers::LeagueWithCountry};
+use crate::{
+    constants::{self, sports::Sport},
+    db::{self, helpers::LeagueWithCountry},
+};
 
 #[get("/")]
+async fn get_route_desc() -> &'static str {
+    "Hello, world!"
+}
+
+#[get("/all")]
 async fn get_all_streams() -> Json<Vec<Stream>> {
     let mut conn = db::helpers::establish_connection().unwrap();
     let streams = db::helpers::get_streams(&mut conn).unwrap();
@@ -70,6 +78,13 @@ async fn info_get_leagues() -> Json<Vec<LeagueWithCountry>> {
     Json(leagues)
 }
 
+#[get("/sports")]
+async fn info_get_sports() -> Json<Vec<Sport>> {
+    let sports = constants::sports::SPORTS.to_vec();
+
+    Json(sports)
+}
+
 pub async fn run(port: u16, silent: bool) -> anyhow::Result<()> {
     Rocket::custom(rocket::Config {
         port,
@@ -83,6 +98,7 @@ pub async fn run(port: u16, silent: bool) -> anyhow::Result<()> {
     .mount(
         "/",
         routes![
+            get_route_desc,
             get_all_streams,
             get_active_streams,
             get_stream_by_id,
@@ -92,7 +108,7 @@ pub async fn run(port: u16, silent: bool) -> anyhow::Result<()> {
             get_streams_by_either_team,
         ],
     )
-    .mount("/info", routes![info_get_leagues])
+    .mount("/info", routes![info_get_leagues, info_get_sports])
     .launch()
     .await?;
 

@@ -17,7 +17,7 @@
   - [x] Add CI
   - [x] remove `unwrap()`s
   - [x] Store Timestamps instead of strings
-  - [ ] Other sports
+  - [x] Other sports
 
 - to install use the following commands
 
@@ -32,14 +32,24 @@
   ```bash
   sportshub
 
-  # to scrape use, where <T> is number of simultaneous tabs (defaults to 10)
-  sportshub scrape <T>
+  # to scrape all events, where <T> is number of simultaneous tabs use (defaults to 10)
+  sportshub data scrape -t <T>
+
+  # to scrape stream links (videos) use (use -H for headless)
+  sportshub data update -t <T> -H
 
   # to run the http api use
-  sportshub server
+  sportshub serve
 
   # to run on custom port use
-  sportshub server -p <PORT>
+  sportshub serve -p <PORT>
+
+  # to run the server silently use
+  sportshub serve -s
+
+  # to do a full data refresh before serving use
+  sportshub serve -F
+
   ```
 
 - You can use crontab to refresh every 15 minutes,
