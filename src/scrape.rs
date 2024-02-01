@@ -17,7 +17,7 @@ use crate::{
     constants::sports::{self, Sport},
     db,
     query_selectors,
-    scrape_utils,
+    scrape_utils::{self, create_browser},
 };
 
 
@@ -42,25 +42,12 @@ pub fn start_scraping(open_tabs: usize, headless: bool) -> Result<(), anyhow::Er
     // so... TODO!
     check_all_links(&browser, &mut conn, open_tabs)?;
 
-    // we close all the tabs because otherwise it shows an error when program
-    // finishes
-    for t in (*browser.get_tabs().as_ref().lock().unwrap()).iter() {
-        t.close(true)?;
-    }
 
     Ok(())
 }
 
 pub fn update_streams(open_tabs: usize, headless: bool) -> Result<(), anyhow::Error> {
-    // realised we didnt need adblocker when headless
-    let browser = Browser::new({
-        headless_chrome::LaunchOptions {
-            headless,
-            sandbox: true,
-            ignore_certificate_errors: true,
-            ..Default::default()
-        }
-    })?;
+    let browser = create_browser(headless)?;
 
     let mut conn = db::helpers::establish_connection()?;
 
@@ -174,7 +161,7 @@ pub fn parse_game(conn: &mut SqliteConnection, sport: &str, html: &str) -> Resul
     let new_stream = models::StreamNew {
         home: &home.trim(),
         away: &away.trim(),
-        start_time: time.unwrap(),
+        start_time: time.ok_or(anyhow!("invalid time for {} - {}", &home.trim(), &away.trim()))?,
         league,
         country: &country.trim(),
         url: &url.trim(),
