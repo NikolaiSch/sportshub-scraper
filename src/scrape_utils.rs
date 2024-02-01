@@ -232,7 +232,7 @@ pub fn check_all_links(browser: &Browser, conn: &mut SqliteConnection, tabs_coun
     // for each tab count we create a new tab and a new thread
     for tab_num in 0..tabs_count {
         // we create a new tab and push it to the tabs vector
-        let tab = browser.new_tab().unwrap();
+        let tab = browser.new_tab()?;
         tabs.push(tab.clone());
 
         // we get the streams from the chunked streams and turn it to a vec

@@ -45,3 +45,40 @@ pub fn delete_all_past_streams(conn: &mut SqliteConnection) -> Result<usize, any
             .execute(conn)?,
     )
 }
+
+pub fn get_streams_by_sport(conn: &mut SqliteConnection, search_sport: String) -> Result<Vec<Stream>, anyhow::Error> {
+    Ok(stream
+        .filter(schema::stream::sport.eq(search_sport))
+        .load::<Stream>(conn)?)
+}
+
+pub fn get_streams_by_home_team(
+    conn: &mut SqliteConnection,
+    search_home_team: String,
+) -> Result<Vec<Stream>, anyhow::Error> {
+    Ok(stream
+        .filter(schema::stream::home.eq(search_home_team))
+        .load::<Stream>(conn)?)
+}
+
+pub fn get_streams_by_away_team(
+    conn: &mut SqliteConnection,
+    search_away_team: String,
+) -> Result<Vec<Stream>, anyhow::Error> {
+    Ok(stream
+        .filter(schema::stream::away.eq(search_away_team))
+        .load::<Stream>(conn)?)
+}
+
+pub fn get_streams_by_either_team(
+    conn: &mut SqliteConnection,
+    search_team: String,
+) -> Result<Vec<Stream>, anyhow::Error> {
+    Ok(stream
+        .filter(
+            schema::stream::home
+                .eq(search_team.clone())
+                .or(schema::stream::away.eq(search_team)),
+        )
+        .load::<Stream>(conn)?)
+}

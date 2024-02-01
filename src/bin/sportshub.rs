@@ -37,7 +37,7 @@ enum Commands {
     },
 }
 
-#[tokio::main]
+#[rocket::main]
 async fn main() {
     let mut conn = db::helpers::establish_connection().unwrap();
 
@@ -50,7 +50,7 @@ async fn main() {
         }
         Some(Commands::Server { port }) => {
             run_migrations(&mut conn).unwrap();
-            web_server_utils::run(port).await;
+            web_server_utils::run(port).await.unwrap();
         }
         None => {
             println!("use sportshub -h for help");
