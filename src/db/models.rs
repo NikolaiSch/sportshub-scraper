@@ -76,7 +76,7 @@ mod tests {
 
         let serialised = serde_json::to_string(&stream).unwrap();
         assert_eq!(serialised,
-                   "{\"id\":1,\"home\":\"home\",\"away\":\"away\",\"start_time\":100000,\"league\":\"league\",\"country\":\"country\",\"url\":\"url\",\"stream_link\":[\"stream_link\"]}");
+                   "{\"id\":1,\"home\":\"home\",\"away\":\"away\",\"start_time\":100000,\"league\":\"league\",\"country\":\"country\",\"url\":\"url\",\"stream_link\":[\"stream_link\"],\"sport\":\"sport\"}");
     }
 
     #[test]
@@ -95,7 +95,7 @@ mod tests {
 
         let serialised = serde_json::to_string(&stream).unwrap();
         assert_eq!(serialised,
-                   "{\"id\":1,\"home\":\"home\",\"away\":\"away\",\"start_time\":100,\"league\":\"league\",\"country\":\"country\",\"url\":\"url\",\"stream_link\":[\"stream_link\",\"stream_link2\"]}");
+                   "{\"id\":1,\"home\":\"home\",\"away\":\"away\",\"start_time\":100,\"league\":\"league\",\"country\":\"country\",\"url\":\"url\",\"stream_link\":[\"stream_link\",\"stream_link2\"],\"sport\":\"sport\"}");
     }
 
     #[test]
@@ -114,6 +114,6 @@ mod tests {
 
         let serialised = serde_json::to_string(&stream).unwrap();
         assert_eq!(serialised,
-                   "{\"id\":1,\"home\":\"home\",\"away\":\"away\",\"start_time\":90000,\"league\":\"league\",\"country\":\"country\",\"url\":\"url\",\"stream_link\":[\"\"]}");
+                   "{\"id\":1,\"home\":\"home\",\"away\":\"away\",\"start_time\":90000,\"league\":\"league\",\"country\":\"country\",\"url\":\"url\",\"stream_link\":[\"\"],\"sport\":\"sport\"}");
     }
 }

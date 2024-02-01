@@ -14,6 +14,8 @@
   - [x] Add RustDoc comments
   - [x] Create cli
   - [x] Add tests
+    - [ ] Add server tests
+    - [ ] Add scraper tests
   - [x] Add CI
   - [x] remove `unwrap()`s
   - [x] Store Timestamps instead of strings
