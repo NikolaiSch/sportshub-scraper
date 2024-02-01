@@ -20,11 +20,11 @@ use crate::{
 };
 
 
-pub fn start_scraping(open_tabs: usize) -> Result<(), anyhow::Error> {
+pub fn start_scraping(open_tabs: usize, headless: bool) -> Result<(), anyhow::Error> {
     // realised we didnt need adblocker when headless
     let browser = Browser::new({
         headless_chrome::LaunchOptions {
-            headless: false,
+            headless,
             sandbox: true,
             ignore_certificate_errors: true,
             ..Default::default()
@@ -58,6 +58,35 @@ pub fn start_scraping(open_tabs: usize) -> Result<(), anyhow::Error> {
     Ok(())
 }
 
+pub fn update_streams(open_tabs: usize, headless: bool) -> Result<(), anyhow::Error> {
+    // realised we didnt need adblocker when headless
+    let browser = Browser::new({
+        headless_chrome::LaunchOptions {
+            headless,
+            sandbox: true,
+            ignore_certificate_errors: true,
+            ..Default::default()
+        }
+    })?;
+
+    let mut conn = db::helpers::establish_connection()?;
+
+    // we get all the links from database that don't have stream links
+    // and we check them in parallel
+    // my 8gb ram m1 macbook air can handle 10 tabs relatively easily
+    // takes ~27 seconds to scan everything
+    // however can improve by using a shared queue instead of splitting it
+    // so... TODO!
+    check_all_links(&browser, &mut conn, open_tabs)?;
+
+    // we close all the tabs because otherwise it shows an error when program
+    // finishes
+    for t in (*browser.get_tabs().as_ref().lock().unwrap()).iter() {
+        t.close(true)?;
+    }
+
+    Ok(())
+}
 
 /// This function scrapes all the games from the home page and saves them to database.
 /// It takes roughly 1 second to scrape ~500 games.
@@ -275,6 +304,36 @@ pub fn check_all_links(browser: &Browser, conn: &mut SqliteConnection, tabs_coun
 
 pub fn check_link(tab: &mut Arc<Tab>, conn: &mut SqliteConnection, link: &str) -> Result<(), anyhow::Error> {
     url_to_links(tab.borrow_mut(), conn.borrow_mut(), link).unwrap();
+
+    Ok(())
+}
+
+
+pub fn scrape_events(headless: bool) -> Result<(), anyhow::Error> {
+    // realised we didnt need adblocker when headless
+    let browser = Browser::new({
+        headless_chrome::LaunchOptions {
+            headless,
+            sandbox: true,
+            ignore_certificate_errors: true,
+            ..Default::default()
+        }
+    })?;
+
+    let mut conn = db::helpers::establish_connection()?;
+
+    let tab = browser.new_tab()?;
+
+
+    for sport in sports::SPORTS.iter() {
+        today_games(&tab, &mut conn, sport)?;
+    }
+
+    // we close all the tabs because otherwise it shows an error when program
+    // finishes
+    for t in (*browser.get_tabs().as_ref().lock().unwrap()).iter() {
+        t.close(true)?;
+    }
 
     Ok(())
 }

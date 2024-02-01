@@ -4,7 +4,7 @@
 use db::models::Stream;
 use rocket::{get, routes, serde::json::Json, Rocket};
 
-use crate::db;
+use crate::db::{self, helpers::LeagueWithCountry};
 
 #[get("/")]
 async fn get_all_streams() -> Json<Vec<Stream>> {
@@ -62,9 +62,22 @@ async fn get_streams_by_either_team(team: &str) -> Json<Vec<Stream>> {
     Json(streams)
 }
 
-pub async fn run(port: u16) -> anyhow::Result<()> {
+#[get("/leagues")]
+async fn info_get_leagues() -> Json<Vec<LeagueWithCountry>> {
+    let mut conn = db::helpers::establish_connection().unwrap();
+    let leagues = db::helpers::get_unique_leagues_with_country(&mut conn).unwrap();
+
+    Json(leagues)
+}
+
+pub async fn run(port: u16, silent: bool) -> anyhow::Result<()> {
     Rocket::custom(rocket::Config {
         port,
+        log_level: if silent {
+            rocket::config::LogLevel::Off
+        } else {
+            rocket::config::LogLevel::Normal
+        },
         ..Default::default()
     })
     .mount(
@@ -79,6 +92,7 @@ pub async fn run(port: u16) -> anyhow::Result<()> {
             get_streams_by_either_team,
         ],
     )
+    .mount("/info", routes![info_get_leagues])
     .launch()
     .await?;
 
