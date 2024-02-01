@@ -1,26 +1,31 @@
 //! This module contains the models for the diesel ORM
 
-use diesel::prelude::*;
+use std::fmt::Debug;
+
+use diesel::{
+    prelude::*,
+    sql_types::{Time, Timestamp},
+};
 use serde::{ser::SerializeStruct, Deserialize, Serialize};
 
-#[derive(Debug, Queryable, Deserialize, Clone)]
+#[derive(Debug, Queryable, Clone)]
 pub struct Stream {
     pub id: Option<i32>,
     pub away: String,
     pub home: String,
-    pub start_time: String,
+    pub start_time: chrono::NaiveDateTime,
     pub league: String,
     pub country: String,
     pub url: String,
     pub stream_link: String,
 }
 
-#[derive(Debug, Insertable, Deserialize, Clone)]
+#[derive(Debug, Insertable, Clone)]
 #[diesel(table_name = crate::db::schema::stream)]
 pub struct StreamNew<'a> {
     pub home: &'a str,
     pub away: &'a str,
-    pub start_time: &'a str,
+    pub start_time: chrono::NaiveDateTime,
     pub league: &'a str,
     pub country: &'a str,
     pub url: &'a str,
@@ -37,7 +42,7 @@ impl Serialize for Stream {
         stream.serialize_field("id", &self.id)?;
         stream.serialize_field("home", &self.home)?;
         stream.serialize_field("away", &self.away)?;
-        stream.serialize_field("start_time", &self.start_time)?;
+        stream.serialize_field("start_time", &self.start_time.timestamp())?;
         stream.serialize_field("league", &self.league)?;
         stream.serialize_field("country", &self.country)?;
         stream.serialize_field("url", &self.url)?;
@@ -47,6 +52,8 @@ impl Serialize for Stream {
 }
 
 mod tests {
+    use chrono::NaiveDateTime;
+
     use crate::db::models::Stream;
 
 
@@ -56,7 +63,7 @@ mod tests {
             id: Some(1),
             home: "home".to_string(),
             away: "away".to_string(),
-            start_time: "start_time".to_string(),
+            start_time: NaiveDateTime::from_timestamp_millis(100000000).unwrap(),
             league: "league".to_string(),
             country: "country".to_string(),
             url: "url".to_string(),
@@ -65,7 +72,7 @@ mod tests {
 
         let serialised = serde_json::to_string(&stream).unwrap();
         assert_eq!(serialised,
-                   "{\"id\":1,\"home\":\"home\",\"away\":\"away\",\"start_time\":\"start_time\",\"league\":\"league\",\"country\":\"country\",\"url\":\"url\",\"stream_link\":[\"stream_link\"]}");
+                   "{\"id\":1,\"home\":\"home\",\"away\":\"away\",\"start_time\":100000,\"league\":\"league\",\"country\":\"country\",\"url\":\"url\",\"stream_link\":[\"stream_link\"]}");
     }
 
     #[test]
@@ -74,7 +81,7 @@ mod tests {
             id: Some(1),
             home: "home".to_string(),
             away: "away".to_string(),
-            start_time: "start_time".to_string(),
+            start_time: NaiveDateTime::from_timestamp_millis(100000).unwrap(),
             league: "league".to_string(),
             country: "country".to_string(),
             url: "url".to_string(),
@@ -83,7 +90,7 @@ mod tests {
 
         let serialised = serde_json::to_string(&stream).unwrap();
         assert_eq!(serialised,
-                   "{\"id\":1,\"home\":\"home\",\"away\":\"away\",\"start_time\":\"start_time\",\"league\":\"league\",\"country\":\"country\",\"url\":\"url\",\"stream_link\":[\"stream_link\",\"stream_link2\"]}");
+                   "{\"id\":1,\"home\":\"home\",\"away\":\"away\",\"start_time\":100,\"league\":\"league\",\"country\":\"country\",\"url\":\"url\",\"stream_link\":[\"stream_link\",\"stream_link2\"]}");
     }
 
     #[test]
@@ -92,7 +99,7 @@ mod tests {
             id: Some(1),
             home: "home".to_string(),
             away: "away".to_string(),
-            start_time: "start_time".to_string(),
+            start_time: NaiveDateTime::from_timestamp_millis(90000000).unwrap(),
             league: "league".to_string(),
             country: "country".to_string(),
             url: "url".to_string(),
@@ -101,6 +108,6 @@ mod tests {
 
         let serialised = serde_json::to_string(&stream).unwrap();
         assert_eq!(serialised,
-                   "{\"id\":1,\"home\":\"home\",\"away\":\"away\",\"start_time\":\"start_time\",\"league\":\"league\",\"country\":\"country\",\"url\":\"url\",\"stream_link\":[\"\"]}");
+                   "{\"id\":1,\"home\":\"home\",\"away\":\"away\",\"start_time\":90000,\"league\":\"league\",\"country\":\"country\",\"url\":\"url\",\"stream_link\":[\"\"]}");
     }
 }

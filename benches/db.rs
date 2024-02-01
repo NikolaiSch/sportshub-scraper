@@ -1,3 +1,4 @@
+use chrono::NaiveDateTime;
 use criterion::{criterion_group, criterion_main, Criterion};
 use scraper::db;
 
@@ -17,7 +18,7 @@ fn criterion_benchmark(c: &mut Criterion) {
             home: "Home",
             league: "League",
             country: "Country",
-            start_time: "Start Time",
+            start_time: NaiveDateTime::from_timestamp_millis(100000000).unwrap(),
             url: "Url",
             stream_link: "https://www.test.com",
         };

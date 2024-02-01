@@ -17,6 +17,7 @@ use chrono::{Datelike, TimeZone, Utc};
 /// assert_eq!(parsed_date, "1-2-0-00".to_string());
 /// ```
 pub fn date_parser(date: &str) -> String {
+    let date = date.trim();
     let date = date.replace(" at ", " ");
     let date = date.replace("January", "1");
     let date = date.replace("February", "2");
@@ -61,10 +62,15 @@ pub fn date_parser(date: &str) -> String {
 /// ```
 pub fn date_parser_to_instant(date: &str, year: i32) -> Result<i64, Error> {
     let date = date.split("-").collect::<Vec<&str>>();
-    let day = date[0].parse::<u32>()?;
-    let month = date[1].parse::<u32>()?;
-    let hour = date[2].parse::<u32>()?;
-    let minute = date[3].parse::<u32>()?;
+    let day = date[0].parse::<u32>().unwrap();
+    let month = date[1].parse::<u32>().unwrap();
+    let hour = date[2].parse::<u32>().unwrap();
+    let minute = date[3].parse::<u32>().unwrap();
+
+    let mut year = year;
+    if day == 1 && month == 1 && hour == 1 && minute == 1 {
+        year = 1990;
+    }
 
     let t = Utc.with_ymd_and_hms(year, month, day, hour, minute, 0);
 

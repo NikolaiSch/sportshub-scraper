@@ -5,7 +5,7 @@ diesel::table! {
         id -> Nullable<Integer>,
         home -> Text,
         away -> Text,
-        start_time -> Text,
+        start_time -> Timestamp,
         league -> Text,
         country -> Text,
         url -> Text,
