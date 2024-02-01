@@ -18,6 +18,7 @@ pub struct Stream {
     pub country: String,
     pub url: String,
     pub stream_link: String,
+    pub sport: String,
 }
 
 #[derive(Debug, Insertable, Clone)]
@@ -30,6 +31,7 @@ pub struct StreamNew<'a> {
     pub country: &'a str,
     pub url: &'a str,
     pub stream_link: &'a str,
+    pub sport: &'a str,
 }
 
 impl Serialize for Stream {
@@ -47,6 +49,7 @@ impl Serialize for Stream {
         stream.serialize_field("country", &self.country)?;
         stream.serialize_field("url", &self.url)?;
         stream.serialize_field("stream_link", &split_streams)?;
+        stream.serialize_field("sport", &self.sport)?;
         stream.end()
     }
 }
@@ -68,6 +71,7 @@ mod tests {
             country: "country".to_string(),
             url: "url".to_string(),
             stream_link: "stream_link".to_string(),
+            sport: "sport".to_string(),
         };
 
         let serialised = serde_json::to_string(&stream).unwrap();
@@ -86,6 +90,7 @@ mod tests {
             country: "country".to_string(),
             url: "url".to_string(),
             stream_link: "stream_link,stream_link2".to_string(),
+            sport: "sport".to_string(),
         };
 
         let serialised = serde_json::to_string(&stream).unwrap();
@@ -104,6 +109,7 @@ mod tests {
             country: "country".to_string(),
             url: "url".to_string(),
             stream_link: "".to_string(),
+            sport: "sport".to_string(),
         };
 
         let serialised = serde_json::to_string(&stream).unwrap();

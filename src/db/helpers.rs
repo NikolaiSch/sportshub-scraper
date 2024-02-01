@@ -1,5 +1,7 @@
 //! Database operation helpers for sqlite, using diesel
 
+use std::time::{Duration, Instant};
+
 use diesel::{prelude::*, RunQueryDsl};
 
 use super::{
@@ -14,11 +16,10 @@ pub fn establish_connection() -> Result<SqliteConnection, anyhow::Error> {
     Ok(SqliteConnection::establish(&database_url)?)
 }
 
-pub fn create_stream(conn: &mut SqliteConnection,
-                     new_stream: &StreamNew)
-                     -> Result<usize, anyhow::Error> {
-    Ok(diesel::insert_or_ignore_into(stream::table).values(new_stream)
-                                                   .execute(conn)?)
+pub fn create_stream(conn: &mut SqliteConnection, new_stream: &StreamNew) -> Result<usize, anyhow::Error> {
+    Ok(diesel::insert_or_ignore_into(stream::table)
+        .values(new_stream)
+        .execute(conn)?)
 }
 
 pub fn get_streams(conn: &mut SqliteConnection) -> Result<Vec<Stream>, anyhow::Error> {
@@ -26,18 +27,21 @@ pub fn get_streams(conn: &mut SqliteConnection) -> Result<Vec<Stream>, anyhow::E
 }
 
 pub fn get_empty_streams(conn: &mut SqliteConnection) -> Result<Vec<Stream>, anyhow::Error> {
-    Ok(stream.filter(schema::stream::stream_link.eq(""))
-             .load::<Stream>(conn)?)
+    Ok(stream.filter(schema::stream::stream_link.eq("")).load::<Stream>(conn)?)
 }
 
 pub fn get_linked_streams(conn: &mut SqliteConnection) -> Result<Vec<Stream>, anyhow::Error> {
-    Ok(stream.filter(schema::stream::stream_link.ne(""))
-             .load::<Stream>(conn)?)
+    Ok(stream.filter(schema::stream::stream_link.ne("")).load::<Stream>(conn)?)
 }
 
-pub fn get_streams_by_id(conn: &mut SqliteConnection,
-                         search_id: i32)
-                         -> Result<Vec<Stream>, anyhow::Error> {
-    Ok(stream.filter(schema::stream::id.eq(search_id))
-             .load::<Stream>(conn)?)
+pub fn get_streams_by_id(conn: &mut SqliteConnection, search_id: i32) -> Result<Vec<Stream>, anyhow::Error> {
+    Ok(stream.filter(schema::stream::id.eq(search_id)).load::<Stream>(conn)?)
+}
+
+pub fn delete_all_past_streams(conn: &mut SqliteConnection) -> Result<usize, anyhow::Error> {
+    println!("Deleting all 3+ hour past streams...");
+    Ok(
+        diesel::delete(stream.filter(start_time.le(chrono::Utc::now().naive_utc() - Duration::from_secs(3 * 60 * 60))))
+            .execute(conn)?,
+    )
 }

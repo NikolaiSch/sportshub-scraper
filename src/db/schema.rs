@@ -10,5 +10,6 @@ diesel::table! {
         country -> Text,
         url -> Text,
         stream_link -> Text,
+        sport -> Text,
     }
 }
