@@ -38,7 +38,7 @@ enum Commands {
 
 #[tokio::main]
 async fn main() {
-    let mut conn = db::establish_connection().unwrap();
+    let mut conn = db::helpers::establish_connection().unwrap();
 
     let cli = Cli::parse();
 
