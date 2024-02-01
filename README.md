@@ -13,7 +13,7 @@
   - [x] Fix advertisement causing delay
   - [x] Add RustDoc comments
   - [x] Create cli
-  - [ ] Add tests
+  - [x] Add tests
   - [x] Add CI
   - [x] remove `unwrap()`s
   - [ ] Store Timestamps instead of strings
