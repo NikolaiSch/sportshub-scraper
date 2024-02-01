@@ -7,9 +7,11 @@ use scraper::{db, scrape_utils, web_server_utils};
 pub const MIGRATIONS: EmbeddedMigrations = embed_migrations!("migrations");
 
 fn run_migrations(connection: &mut impl MigrationHarness<Sqlite>) -> Result<(), Error> {
-    connection.revert_all_migrations(MIGRATIONS).unwrap();
+    connection.revert_all_migrations(MIGRATIONS)
+              .unwrap();
     println!("Reverted all migrations");
-    connection.run_pending_migrations(MIGRATIONS).unwrap();
+    connection.run_pending_migrations(MIGRATIONS)
+              .unwrap();
 
     Ok(())
 }
@@ -43,14 +45,14 @@ async fn main() {
     let cli = Cli::parse();
 
     match cli.command {
-        Some(Commands::Parse { tabs }) => {
+        | Some(Commands::Parse { tabs }) => {
             run_migrations(&mut conn).unwrap();
             scrape_utils::start_scraping(tabs).unwrap();
         }
-        Some(Commands::Server { port }) => {
+        | Some(Commands::Server { port }) => {
             web_server_utils::run(port).await;
         }
-        None => {
+        | None => {
             println!("use sportshub -h for help");
         }
     }

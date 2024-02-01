@@ -1,10 +1,10 @@
 //! This module contains the web server for the API.
 //! It uses the rocket framework.
 
-use crate::db;
 use db::models::Stream;
-
 use rocket::{get, routes, serde::json::Json, Rocket};
+
+use crate::db;
 
 #[get("/")]
 async fn get_all_streams() -> Json<Vec<Stream>> {
@@ -31,15 +31,12 @@ async fn get_stream_by_id(id: i32) -> Json<Vec<Stream>> {
 }
 
 pub async fn run(port: u16) {
-    Rocket::custom(rocket::Config {
-        port,
-        ..Default::default()
-    })
-    .mount(
-        "/",
-        routes![get_all_streams, get_active_streams, get_stream_by_id],
-    )
-    .launch()
-    .await
-    .unwrap();
+    Rocket::custom(rocket::Config { port,
+                                    ..Default::default() }).mount("/",
+                                                                  routes![get_all_streams,
+                                                                          get_active_streams,
+                                                                          get_stream_by_id])
+                                                           .launch()
+                                                           .await
+                                                           .unwrap();
 }
