@@ -16,7 +16,7 @@
   - [x] Add tests
   - [x] Add CI
   - [x] remove `unwrap()`s
-  - [ ] Store Timestamps instead of strings
+  - [x] Store Timestamps instead of strings
   - [ ] Other sports
 
 - to install use the following commands
