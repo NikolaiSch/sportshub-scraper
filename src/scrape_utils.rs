@@ -80,7 +80,7 @@ pub fn parse_game(conn: &mut SqliteConnection, html: &str) -> Result<(), anyhow:
 
     // we split the info into league and time
     let mut info_parsed = info.split('/');
-    let league = &info_parsed.next().unwrap_or("Unknown").to_string();
+    let league = &info_parsed.next().unwrap_or("Unknown").trim().to_string();
     let time = chrono::NaiveDateTime::from_timestamp_opt(
         crate::date_parser::date_string_to_timestamp(info_parsed.next().unwrap_or("Unknown"))?,
         0,
@@ -93,12 +93,12 @@ pub fn parse_game(conn: &mut SqliteConnection, html: &str) -> Result<(), anyhow:
     // we create a new stream and save it to database
     // we leave stream_link empty for now
     let new_stream = models::StreamNew {
-        home: &home,
-        away: &away,
+        home: &home.trim(),
+        away: &away.trim(),
         start_time: time.unwrap(),
         league,
-        country: &country,
-        url: &url,
+        country: &country.trim(),
+        url: &url.trim(),
         stream_link: "",
     };
 
