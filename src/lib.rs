@@ -1,3 +1,4 @@
+pub mod date_parser;
 pub mod db;
 pub mod query_selectors;
 pub mod scrape_utils;

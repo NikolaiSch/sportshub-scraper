@@ -47,7 +47,8 @@ impl Serialize for Stream {
 }
 
 mod tests {
-    
+    use crate::db::models::Stream;
+
 
     #[test]
     fn test_serialise_streamlink() {

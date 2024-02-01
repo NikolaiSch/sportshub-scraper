@@ -9,9 +9,11 @@ extern crate diesel;
 
 const OPEN_TABS: usize = 10;
 
-use scraper::scrape_utils::start_scraping;
+use std::time;
+
+use chrono::Utc;
+use scraper::{date_parser, scrape_utils::start_scraping};
 
 fn main() {
     // This should be the only place it can panic
-    start_scraping(OPEN_TABS).unwrap();
 }
