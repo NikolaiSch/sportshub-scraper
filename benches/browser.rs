@@ -13,15 +13,9 @@ fn create_connection() {
         }
     });
 
-    browser
-        .unwrap()
-        .get_tabs()
-        .lock()
-        .unwrap()
-        .iter()
-        .for_each(|e| {
-            e.close(false).unwrap();
-        })
+    browser.unwrap().get_tabs().lock().unwrap().iter().for_each(|e| {
+        e.close(false).unwrap();
+    })
 }
 
 fn create_connection_headless() {
@@ -34,15 +28,9 @@ fn create_connection_headless() {
         }
     });
 
-    browser
-        .unwrap()
-        .get_tabs()
-        .lock()
-        .unwrap()
-        .iter()
-        .for_each(|e| {
-            e.close(false).unwrap();
-        })
+    browser.unwrap().get_tabs().lock().unwrap().iter().for_each(|e| {
+        e.close(false).unwrap();
+    })
 }
 
 fn create_connection_with_sandbox() {
@@ -55,15 +43,9 @@ fn create_connection_with_sandbox() {
         }
     });
 
-    browser
-        .unwrap()
-        .get_tabs()
-        .lock()
-        .unwrap()
-        .iter()
-        .for_each(|e| {
-            e.close(false).unwrap();
-        })
+    browser.unwrap().get_tabs().lock().unwrap().iter().for_each(|e| {
+        e.close(false).unwrap();
+    })
 }
 
 fn create_connection_with_extensions() {
@@ -77,15 +59,9 @@ fn create_connection_with_extensions() {
         }
     });
 
-    browser
-        .unwrap()
-        .get_tabs()
-        .lock()
-        .unwrap()
-        .iter()
-        .for_each(|e| {
-            e.close(false).unwrap();
-        })
+    browser.unwrap().get_tabs().lock().unwrap().iter().for_each(|e| {
+        e.close(false).unwrap();
+    })
 }
 
 fn criterion_benchmark(c: &mut Criterion) {
@@ -101,14 +77,10 @@ fn criterion_benchmark(c: &mut Criterion) {
     group.bench_function("Create new browser basic", |b| b.iter(create_connection));
 
     // 0.943 seconds
-    group.bench_function("Create new browser headless", |b| {
-        b.iter(create_connection_headless)
-    });
+    group.bench_function("Create new browser headless", |b| b.iter(create_connection_headless));
 
     // 1.48 seconds
-    group.bench_function("Create new browser sandbox", |b| {
-        b.iter(create_connection_with_sandbox)
-    });
+    group.bench_function("Create new browser sandbox", |b| b.iter(create_connection_with_sandbox));
 
     // 1.69 seconds
     group.bench_function("Create new browser adblock ext", |b| {

@@ -31,12 +31,12 @@ async fn get_stream_by_id(id: i32) -> Json<Vec<Stream>> {
 }
 
 pub async fn run(port: u16) {
-    Rocket::custom(rocket::Config { port,
-                                    ..Default::default() }).mount("/",
-                                                                  routes![get_all_streams,
-                                                                          get_active_streams,
-                                                                          get_stream_by_id])
-                                                           .launch()
-                                                           .await
-                                                           .unwrap();
+    Rocket::custom(rocket::Config {
+        port,
+        ..Default::default()
+    })
+    .mount("/", routes![get_all_streams, get_active_streams, get_stream_by_id])
+    .launch()
+    .await
+    .unwrap();
 }
