@@ -24,16 +24,8 @@ thiserror = "1.0.56"
 chrono = "0.4.33"
 
 
-[dev-dependencies]
-criterion = { version = "0.5", features = ["html_reports"] }
 
-[[bench]]
-name = "db"
-harness = false
 
-[[bench]]
-name = "browser"
-harness = false
 
 [profile.release]
 strip = true
