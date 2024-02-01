@@ -9,6 +9,7 @@ use serde::{Deserialize, Serialize};
 use super::{
     models::{Stream, StreamNew},
     schema,
+    schema::stream::{self, dsl::*},
 };
 
 pub const MIGRATIONS: EmbeddedMigrations = diesel_migrations::embed_migrations!("migrations");
