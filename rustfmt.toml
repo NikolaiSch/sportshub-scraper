@@ -7,3 +7,4 @@ format_generated_files = false
 imports_layout = "HorizontalVertical"
 imports_granularity = "Crate"
 group_imports = "StdExternalCrate"
+max_width = 120
