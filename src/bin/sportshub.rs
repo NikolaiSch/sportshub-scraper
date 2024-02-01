@@ -2,7 +2,7 @@ use anyhow::Error;
 use clap::{Parser, Subcommand};
 use diesel::sqlite::Sqlite;
 use diesel_migrations::{embed_migrations, EmbeddedMigrations, MigrationHarness};
-use scraper::{db, scrape_utils, web_server_utils};
+use scraper::{db, scrape, web_server_utils};
 
 
 #[derive(Parser)]
@@ -84,10 +84,10 @@ async fn main() {
         Some(Commands::Data { data_command }) => {
             match data_command {
                 Some(DataCommands::Scrape { headless }) => {
-                    scrape_utils::scrape_events(headless).unwrap();
+                    scrape::scrape_events(headless).unwrap();
                 }
                 Some(DataCommands::Update { tabs, headless }) => {
-                    scrape_utils::update_streams(tabs as usize, headless).unwrap();
+                    scrape::update_streams(tabs as usize, headless).unwrap();
                 }
                 Some(DataCommands::Info {}) => {
                     let streams = db::helpers::get_streams(&mut conn).unwrap();
@@ -121,7 +121,7 @@ async fn main() {
             full_refresh,
         }) => {
             if full_refresh {
-                scrape_utils::start_scraping(10, true).unwrap();
+                scrape::start_scraping(10, true).unwrap();
             }
             web_server_utils::run(port, silent).await.unwrap();
         }
