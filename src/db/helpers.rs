@@ -1,9 +1,9 @@
 //! Database operation helpers for sqlite, using diesel
 
-use std::time::{Duration, Instant};
+use std::time::{Duration};
 
 use anyhow::Error;
-use diesel::{dsl::*, prelude::*, sqlite::Sqlite, RunQueryDsl};
+use diesel::{prelude::*, sqlite::Sqlite, RunQueryDsl};
 use diesel_migrations::{embed_migrations, EmbeddedMigrations, MigrationHarness};
 use serde::{Deserialize, Serialize};
 

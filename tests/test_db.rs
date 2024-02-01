@@ -1,8 +1,7 @@
 use anyhow::Error;
 use chrono::NaiveDateTime;
-use diesel::{sqlite::Sqlite, SqliteConnection};
+use diesel::{SqliteConnection};
 use scraper::db::{
-    self,
     helpers::{self, create_stream},
     models::StreamNew,
 };

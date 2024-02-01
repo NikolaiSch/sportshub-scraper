@@ -2,11 +2,8 @@
 
 use std::fmt::Debug;
 
-use diesel::{
-    prelude::*,
-    sql_types::{Time, Timestamp},
-};
-use serde::{ser::SerializeStruct, Deserialize, Serialize};
+use diesel::prelude::*;
+use serde::{ser::SerializeStruct, Serialize};
 
 #[derive(Debug, Queryable, Clone)]
 pub struct Stream {
