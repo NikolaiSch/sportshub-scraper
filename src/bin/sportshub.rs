@@ -1,8 +1,9 @@
-
 use clap::{Parser, Subcommand};
-
-
-use scraper::{db, scrape, web_server_routes};
+use scraper::{
+    db::{self, helpers::run_migrations},
+    scrape,
+    web_server_routes,
+};
 
 
 #[derive(Parser)]
@@ -77,6 +78,7 @@ enum DataCommands {
 async fn main() {
     let mut conn = db::helpers::establish_connection().unwrap();
 
+    run_migrations(&mut db::helpers::establish_connection().unwrap(), &mut conn).unwrap();
 
     let cli = Cli::parse();
 

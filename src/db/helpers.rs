@@ -1,6 +1,6 @@
 //! Database operation helpers for sqlite, using diesel
 
-use std::time::{Duration};
+use std::time::Duration;
 
 use anyhow::Error;
 use diesel::{prelude::*, sqlite::Sqlite, RunQueryDsl};
