@@ -5,9 +5,7 @@
 
 use std::{
     borrow::BorrowMut,
-    collections::{vec_deque, VecDeque},
-    iter,
-    sync::{Arc, Mutex, RwLock, RwLockWriteGuard},
+    sync::{Arc, Mutex},
     thread,
 };
 
@@ -15,7 +13,7 @@ use anyhow::anyhow;
 use db::{models, schema};
 use diesel::{ExpressionMethods, RunQueryDsl, SqliteConnection};
 use headless_chrome::{Browser, Tab};
-use indicatif::{MultiProgress, ProgressBar, ProgressIterator, ProgressStyle};
+use indicatif::{MultiProgress, ProgressBar, ProgressStyle};
 
 use crate::{
     constants::sports::{self, Sport},
@@ -238,11 +236,11 @@ pub fn check_all_links(browser: &Browser, conn: &mut SqliteConnection, tabs_coun
     // we split the streams into chunks and create a thread for each chunk
     let chunked_streams: Vec<&[models::Stream]> = all_streams.chunks(all_streams.len() / tabs_count).collect();
 
-    let length = all_streams.len();
+    let _length = all_streams.len();
 
     let mut tabs: Vec<Arc<Tab>> = vec![];
     let mut threads = vec![];
-    let completed_mutex = Arc::new(Mutex::new(0));
+    let _completed_mutex = Arc::new(Mutex::new(0));
 
     let time_start = std::time::Instant::now();
 
